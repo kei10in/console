@@ -85,6 +85,7 @@ class MainFrame
 			MESSAGE_HANDLER(UM_UPDATE_TITLES, OnUpdateTitles)
 			MESSAGE_HANDLER(UM_SHOW_POPUP_MENU, OnShowPopupMenu)
 			MESSAGE_HANDLER(UM_START_MOUSE_DRAG, OnStartMouseDrag)
+			MESSAGE_HANDLER(m_uTaskbarRestart, OnTaskbarCreated)
 			MESSAGE_HANDLER(UM_TRAY_NOTIFY, OnTrayNotify)
 			
 			NOTIFY_CODE_HANDLER(CTCN_SELCHANGE, OnTabChanged)
@@ -153,6 +154,7 @@ class MainFrame
 		LRESULT OnShowPopupMenu(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/);
 		LRESULT OnStartMouseDrag(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/);
 		LRESULT OnTrayNotify(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/);
+		LRESULT OnTaskbarCreated(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/);
 
 		LRESULT OnTabChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& bHandled);
 		LRESULT OnTabClose(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /* bHandled */);
@@ -269,6 +271,7 @@ class MainFrame
 
 		CToolBarCtrl	m_toolbar;
 		CAccelerator	m_acceleratorTable;
+		UINT			m_uTaskbarRestart;
 		CMultiPaneStatusBarCtrl m_statusBar;
 
 		CDC				m_dcOffscreen;
