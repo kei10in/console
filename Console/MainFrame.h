@@ -226,6 +226,7 @@ class MainFrame
 		void UnregisterGlobalHotkeys();
 		void CreateStatusBar();
 		BOOL SetTrayIcon(DWORD dwMessage);
+		void ShowHideWindow();
 
 	private:
 
@@ -267,6 +268,7 @@ class MainFrame
 		DWORD			m_dwResizeWindowEdge;
 
 		bool			m_bRestoringWindow;
+		bool			m_bHideWindow;
 		CRect			m_rectRestoredWnd;
 
 		CToolBarCtrl	m_toolbar;

@@ -53,6 +53,7 @@ MainFrame::MainFrame
 , m_dwWindowHeight(0)
 , m_dwResizeWindowEdge(WMSZ_BOTTOM)
 , m_bRestoringWindow(false)
+, m_bHideWindow(false)
 , m_rectRestoredWnd(0, 0, 0, 0)
 , m_animationWindow()
 {
@@ -602,6 +603,11 @@ LRESULT MainFrame::OnSize(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHa
 		}
 */
 	}
+	else if (g_settingsHandler->GetAppearanceSettings().stylesSettings.bTrayIcon && (wParam == SIZE_MINIMIZED))
+	{
+		m_bHideWindow = true;
+		ShowWindow(SW_HIDE);
+	}
 
 // 	CRect rectWindow;
 // 	GetWindowRect(&rectWindow);
@@ -1016,8 +1022,8 @@ LRESULT MainFrame::OnTrayNotify(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam,
 		case WM_LBUTTONDOWN : 
 		{
 			// TODO: handle
-//			m_bHideWindow = false;
-//			ShowHideWindow();
+			m_bHideWindow = false;
+			ShowHideWindow();
 			::SetForegroundWindow(m_hWnd);
 			return 0;
 		}
@@ -1025,9 +1031,10 @@ LRESULT MainFrame::OnTrayNotify(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam,
 		case WM_LBUTTONDBLCLK :
 		{
 			// TODO: handle
-//			m_bHideWindow = !m_bHideWindow;
-//			ShowHideWindow();
-//			::SetForegroundWindow(m_hWnd);
+			m_bHideWindow = !m_bHideWindow;
+			ShowHideWindow();
+			if (!m_bHideWindow)
+				::SetForegroundWindow(m_hWnd);
 			return 0;
 		}
 			
@@ -2610,6 +2617,25 @@ BOOL MainFrame::SetTrayIcon(DWORD dwMessage) {
 	// TODO: there should be a macro somewhere
 	wcsncpy_s(tnd.szTip, _countof(tnd.szTip), strToolTip.c_str(), (sizeof(tnd.szTip)-1)/sizeof(wchar_t));
 	return ::Shell_NotifyIcon(dwMessage, &tnd);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+void MainFrame::ShowHideWindow()
+{
+	if (m_bHideWindow == false)
+	{
+		ShowWindow(SW_SHOW);
+		ShowWindow(SW_RESTORE);
+	}
+	else
+	{
+		ShowWindow(SW_MINIMIZE);
+		ShowWindow(SW_HIDE);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
