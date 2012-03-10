@@ -199,7 +199,7 @@ class MainFrame
 
 		bool CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir = wstring(L""), const wstring& strStartupCmd = wstring(L""), const wstring& strDbgCmdLine = wstring(L""));
 		void CloseTab(CTabViewTabItem* pTabItem);
-		void CloseTab(HWND hwndConsoleView);
+		bool CloseTab(HWND hwndConsoleView, bool bAskOnClose);
 
 		void UpdateTabTitle(const shared_ptr<ConsoleView>& consoleView, CString& strTabTitle);
 		void UpdateTabsMenu(CMenuHandle mainMenu, CMenu& tabsMenu);

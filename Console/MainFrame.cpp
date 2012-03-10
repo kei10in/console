@@ -319,13 +319,33 @@ LRESULT MainFrame::OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 
 	if (bSaveSettings) g_settingsHandler->SaveSettings();
 
-	// destroy all views
+	// try to close all tabs
 	MutexLock viewMapLock(m_viewsMutex);
-	for (ConsoleViewMap::iterator it = m_views.begin(); it != m_views.end(); ++it)
+	if (m_views.size() == 1)
 	{
-		RemoveTab(it->second->m_hWnd);
-		if (m_activeView.get() == it->second.get()) m_activeView.reset();
-		it->second->DestroyWindow();
+		if (CloseTab(m_views.begin()->second->m_hWnd, true) == false)
+		{
+			bHandled = true;
+			return 0;
+		}
+	}
+	else if (m_views.size() > 1)
+	{
+		CString	strMessage;
+		int mb_ret;
+
+		strMessage.Format(IDS_TAB_EXIT_WARN);
+		mb_ret = ::MessageBox(m_hWnd, strMessage, L"Warning", MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);
+
+		if (mb_ret != IDOK)
+		{
+			bHandled = true;
+			return 0;
+		}
+
+		while (m_views.size() > 0) {
+			CloseTab(m_views.begin()->second->m_hWnd, false);
+		}
 	}
 
 	if (g_settingsHandler->GetAppearanceSettings().stylesSettings.bTrayIcon) SetTrayIcon(NIM_DELETE);
@@ -846,7 +866,7 @@ LRESULT MainFrame::OnConsoleResized(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 
 LRESULT MainFrame::OnConsoleClosed(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /* bHandled */)
 {
-	CloseTab(reinterpret_cast<HWND>(wParam));
+	CloseTab(reinterpret_cast<HWND>(wParam), false);
 	return 0;
 }
 
@@ -1650,7 +1670,11 @@ bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir 
 		userCredentials.password= dlg.GetPassword();
 	}
 
-	HWND hwndConsoleView = consoleView->Create(
+	HWND hwndConsoleView = NULL;
+
+	if (!g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex]->bOneTabOnly || g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex]->nTabCount == 0)
+	{
+		hwndConsoleView = consoleView->Create(
 											m_hWnd, 
 											rcDefault, 
 											NULL, 
@@ -1658,6 +1682,15 @@ bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir 
 											0,
 											0U,
 											reinterpret_cast<void*>(&userCredentials));
+	}
+	else
+	{
+		CString	strMessage;
+
+		strMessage.Format(IDS_TAB_ALREADY_EXISTS, g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex]->strTitle.c_str());
+		::MessageBox(m_hWnd, strMessage, L"Error", MB_OK|MB_ICONERROR);
+		return false;
+	}
 
 	if (hwndConsoleView == NULL)
 	{
@@ -1701,6 +1734,8 @@ bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir 
 		ShowTabs(TRUE);
 	}
 
+	g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex]->nTabCount++;
+
 	return true;
 }
 
@@ -1712,7 +1747,7 @@ bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir 
 void MainFrame::CloseTab(CTabViewTabItem* pTabItem)
 {
 	if (!pTabItem) return;
-	CloseTab(pTabItem->GetTabView());
+	CloseTab(pTabItem->GetTabView(), true);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1720,12 +1755,27 @@ void MainFrame::CloseTab(CTabViewTabItem* pTabItem)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void MainFrame::CloseTab(HWND hwndConsoleView)
+bool MainFrame::CloseTab(HWND hwndConsoleView, bool bAskOnClose = false)
 {
 	MutexLock					viewMapLock(m_viewsMutex);
 	ConsoleViewMap::iterator	it = m_views.find(hwndConsoleView);
-	if (it == m_views.end()) return;
+	if (it == m_views.end()) return false;
 
+	if (it->second->GetTabData()->bTabWarn && bAskOnClose)
+	{
+		CString	strMessage;
+		int mb_ret;
+
+		strMessage.Format(IDS_TAB_CLOSE_WARN, it->second->GetTabData()->strTitle.c_str());
+		mb_ret = ::MessageBox(m_hWnd, strMessage, it->second->GetTabData()->strTitle.c_str(), MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);
+
+		if (mb_ret != IDOK)
+		{
+			return false;
+		}
+	}
+
+	it->second->GetTabData()->nTabCount--;
 	RemoveTab(hwndConsoleView);
 	if (m_activeView.get() == it->second.get()) m_activeView.reset();
 	it->second->DestroyWindow();
@@ -1739,6 +1789,8 @@ void MainFrame::CloseTab(HWND hwndConsoleView)
 	}
 
 	if (m_views.size() == 0) PostMessage(WM_CLOSE);
+
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
