@@ -1504,6 +1504,7 @@ bool TabSettings::Load(const CComPtr<IXMLDOMElement>& pSettingsRoot)
 		shared_ptr<TabData>	tabData(new TabData(strDefaultShell, strDefaultInitialDir));
 		CComPtr<IXMLDOMElement>	pConsoleElement;
 		CComPtr<IXMLDOMElement>	pCursorElement;
+		CComPtr<IXMLDOMElement>	pProtectionElement;
 		CComPtr<IXMLDOMElement>	pBackgroundElement;
 
 		XmlHelper::GetAttribute(pTabElement, CComBSTR(L"title"), tabData->strTitle, L"Console");
@@ -1524,6 +1525,12 @@ bool TabSettings::Load(const CComPtr<IXMLDOMElement>& pSettingsRoot)
 		{
 			XmlHelper::GetAttribute(pCursorElement, CComBSTR(L"style"), tabData->dwCursorStyle, 0);
 			XmlHelper::GetRGBAttribute(pCursorElement, tabData->crCursorColor, RGB(255, 255, 255));
+		}
+
+		if (SUCCEEDED(XmlHelper::GetDomElement(pTabElement, CComBSTR(L"protection"), pProtectionElement)))
+		{
+			XmlHelper::GetAttribute(pProtectionElement, CComBSTR(L"confirm_close"), tabData->bTabWarn, false);
+			XmlHelper::GetAttribute(pProtectionElement, CComBSTR(L"one_instance_only"), tabData->bOneTabOnly, false);
 		}
 
 		if (SUCCEEDED(XmlHelper::GetDomElement(pTabElement, CComBSTR(L"background"), pBackgroundElement)))
@@ -1652,6 +1659,18 @@ bool TabSettings::Save(const CComPtr<IXMLDOMElement>& pSettingsRoot)
 
 		SettingsBase::AddTextNode(pSettingsDoc, pNewTabElement, CComBSTR(L"\n\t\t\t"));
 		pNewTabElement->appendChild(pNewCursorElement, &pNewCursorOut);
+
+		// add <protection> tag
+		CComPtr<IXMLDOMElement>	pNewProtectionElement;
+		CComPtr<IXMLDOMNode>	pNewProtectionOut;
+
+		pSettingsDoc->createElement(CComBSTR(L"protection"), &pNewProtectionElement);
+
+		XmlHelper::SetAttribute(pNewProtectionElement, CComBSTR(L"confirm_close"), (*itTab)->bTabWarn ? true : false);
+		XmlHelper::SetAttribute(pNewProtectionElement, CComBSTR(L"one_instance_only"), (*itTab)->bOneTabOnly ? true : false);
+
+		SettingsBase::AddTextNode(pSettingsDoc, pNewTabElement, CComBSTR(L"\n\t\t\t"));
+		pNewTabElement->appendChild(pNewProtectionElement, &pNewProtectionOut);
 
 		// add <background> tag
 		CComPtr<IXMLDOMElement>	pNewBkElement;

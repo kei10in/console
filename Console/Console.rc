@@ -429,6 +429,8 @@ BEGIN
     CONTROL         "",IDC_CURSOR_COLOR,"Static",SS_BLACKFRAME | SS_NOTIFY,140,133,16,14,WS_EX_DLGMODALFRAME
     GROUPBOX        "Cursor",IDC_STATIC,0,120,194,37,0,WS_EX_TRANSPARENT
     GROUPBOX        "Title && icon",IDC_STATIC,0,3,217,50,0,WS_EX_TRANSPARENT
+    CONTROL         "Confirm Close",IDC_CHECK_TAB_WARN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,6,62,8
+    CONTROL         "One Instance Only",IDC_CHECK_TAB_ONE_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,19,75,8
 END
 
 IDD_SETTINGS_TABS_2 DIALOGEX 0, 0, 223, 172
@@ -845,6 +847,9 @@ STRINGTABLE
 BEGIN
     IDR_MAINFRAME           "Console"
     IDS_TAB_CREATE_FAILED   "Failed to open %s tab!\nThe process %s could still be running (use the Task Manager to find it and end it)"
+    IDS_TAB_ALREADY_EXISTS  "Failed to open %s tab!\nThe existing tab must be closed first."
+    IDS_TAB_CLOSE_WARN      "%s tab is still running!\nClose anyway?"
+    IDS_TAB_EXIT_WARN       "There are multiple tabs still running!\nExit anyway?"
 END
 
 STRINGTABLE 

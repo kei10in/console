@@ -21,6 +21,8 @@ PageSettingsTabs1::PageSettingsTabs1()
 , m_bUseDefaultIcon(false)
 , m_strShell(L"")
 , m_strInitialDir(L"")
+, m_nTabWarn(0)
+, m_nOneTabOnly(0)
 , m_bRunAsUser(false)
 , m_strUser(L"")
 {
@@ -233,6 +235,8 @@ void PageSettingsTabs1::Load(shared_ptr<TabData>& tabData)
 
 	m_strShell			= m_tabData->strShell.c_str();
 	m_strInitialDir		= m_tabData->strInitialDir.c_str();
+	m_nTabWarn			= m_tabData->bTabWarn ? 1 : 0;
+	m_nOneTabOnly		= m_tabData->bOneTabOnly ? 1 : 0;
 	m_bRunAsUser		= m_tabData->bRunAsUser;
 	m_strUser			= m_tabData->strUser.c_str();
 
@@ -260,6 +264,8 @@ void PageSettingsTabs1::Save()
 
 	m_tabData->strShell			= m_strShell;
 	m_tabData->strInitialDir	= m_strInitialDir;
+	m_tabData->bTabWarn			= m_nTabWarn > 0;
+	m_tabData->bOneTabOnly		= m_nOneTabOnly > 0;
 	m_tabData->bRunAsUser		= m_bRunAsUser;
 	m_tabData->strUser			= m_strUser;
 

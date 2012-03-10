@@ -590,6 +590,9 @@ struct TabData
 	, strUser()
 	, dwCursorStyle(0)
 	, crCursorColor(RGB(255, 255, 255))
+	, bTabWarn(false)
+	, bOneTabOnly(false)
+	, nTabCount(0)
 	, backgroundImageType(bktypeNone)
 	, crBackgroundColor(RGB(0, 0, 0))
 	, menuBitmap()
@@ -609,6 +612,10 @@ struct TabData
 
 	DWORD							dwCursorStyle;
 	COLORREF						crCursorColor;
+
+	bool							bTabWarn;
+	bool							bOneTabOnly;
+	int								nTabCount;
 
 	BackgroundImageType				backgroundImageType;
 	COLORREF						crBackgroundColor;

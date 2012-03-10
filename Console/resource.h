@@ -6,6 +6,9 @@
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
 #define IDS_TAB_CREATE_FAILED           129
+#define IDS_TAB_CLOSE_WARN              130
+#define IDS_TAB_EXIT_WARN               131
+#define IDS_TAB_ALREADY_EXISTS          132
 #define IDI_ICON1                       203
 #define IDD_RENAME_TAB                  204
 #define IDD_SETTINGS_MAIN               205
@@ -224,6 +227,8 @@
 #define IDC_PASSWORD                    1176
 #define IDC_STATIC_TRIM_CHARS_RIGHT     1176
 #define IDC_CHECK_RUN_AS_USER           1177
+#define IDC_CHECK_TAB_WARN              1178
+#define IDC_CHECK_TAB_ONE_ONLY          1179
 #define ID_NEW_TAB_1                    2000
 #define ID_SWITCH_TAB_1                 2100
 #define ID_NEXT_TAB                     2200
@@ -256,7 +261,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        217
 #define _APS_NEXT_COMMAND_VALUE         32794
-#define _APS_NEXT_CONTROL_VALUE         1178
+#define _APS_NEXT_CONTROL_VALUE         1180
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
