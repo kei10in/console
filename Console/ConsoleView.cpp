@@ -1842,7 +1842,7 @@ void ConsoleView::RepaintText(CDC& dc)
 		dc.SetBkMode(nBkMode);
 		dc.SetBkColor(crBkColor);
 
-		crTxtColor		= m_appearanceSettings.fontSettings.bUseColor ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF];
+		crTxtColor		= (m_appearanceSettings.fontSettings.bUseColor || (m_screenBuffer[dwOffset].charInfo.Attributes & 0xF) == 0x7) ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF];
 		dc.SetTextColor(crTxtColor);
 
 		strText		= m_screenBuffer[dwOffset].charInfo.Char.UnicodeChar;
@@ -1884,9 +1884,9 @@ void ConsoleView::RepaintText(CDC& dc)
 				}
 			}
 
-			if (crTxtColor != (m_appearanceSettings.fontSettings.bUseColor ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF]))
+			if (crTxtColor != ((m_appearanceSettings.fontSettings.bUseColor || (m_screenBuffer[dwOffset].charInfo.Attributes & 0xF) == 0x7) ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF]))
 			{
-				crTxtColor = m_appearanceSettings.fontSettings.bUseColor ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF];
+				crTxtColor = (m_appearanceSettings.fontSettings.bUseColor || (m_screenBuffer[dwOffset].charInfo.Attributes & 0xF) == 0x7) ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF];
 				bTextOut = true;
 			}
 
@@ -2013,7 +2013,7 @@ void ConsoleView::RepaintTextChanges(CDC& dc)
 				}
 				
 				dc.SetBkColor(m_consoleSettings.consoleColors[attrBG]);
-				dc.SetTextColor(m_appearanceSettings.fontSettings.bUseColor ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF]);
+				dc.SetTextColor((m_appearanceSettings.fontSettings.bUseColor || (m_screenBuffer[dwOffset].charInfo.Attributes & 0xF) == 0x7) ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[m_screenBuffer[dwOffset].charInfo.Attributes & 0xF]);
 
 				dc.ExtTextOut(dwX, dwY, ETO_CLIPPED, &rect, &(m_screenBuffer[dwOffset].charInfo.Char.UnicodeChar), 1, NULL);
 			}
