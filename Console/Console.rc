@@ -53,6 +53,19 @@ BEGIN
     EDITTEXT        IDC_USER,54,13,146,14,ES_AUTOHSCROLL
 END
 
+IDD_WINDOWSIZE DIALOGEX 0, 0, 207, 79
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Window size"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Rows:",IDC_STATIC,7,16,36,8
+    EDITTEXT        IDC_ROWS,54,13,146,14,ES_AUTOHSCROLL
+    LTEXT           "&Columns:",IDC_STATIC,7,31,34,8
+    EDITTEXT        IDC_COLUMNS,54,28,146,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,93,58,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,150,58,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -644,6 +657,7 @@ BEGIN
         MENUITEM "Stop Scr&olling",             ID_EDIT_STOP_SCROLLING
         MENUITEM SEPARATOR
         MENUITEM "&Rename Tab",                 ID_EDIT_RENAME_TAB
+        MENUITEM "&Window Size",                ID_EDIT_WINDOW_SIZE
         MENUITEM SEPARATOR
         MENUITEM "&Settings...",                ID_EDIT_SETTINGS
     END
@@ -682,6 +696,7 @@ BEGIN
             MENUITEM "&Paste",                      57637
             MENUITEM SEPARATOR
             MENUITEM "&Rename Tab",                 32781
+            MENUITEM "&Window Size",                ID_EDIT_WINDOW_SIZE
             MENUITEM SEPARATOR
             MENUITEM "&Settings...",                ID_EDIT_SETTINGS
         END

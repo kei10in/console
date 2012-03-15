@@ -109,6 +109,7 @@ class MainFrame
 			COMMAND_ID_HANDLER(ID_EDIT_PASTE, OnEditPaste)
 			COMMAND_ID_HANDLER(ID_EDIT_STOP_SCROLLING, OnEditStopScrolling)
 			COMMAND_ID_HANDLER(ID_EDIT_RENAME_TAB, OnEditRenameTab)
+			COMMAND_ID_HANDLER(ID_EDIT_WINDOW_SIZE, OnEditWindowSize)
 			COMMAND_ID_HANDLER(ID_EDIT_SETTINGS, OnEditSettings)
 			COMMAND_ID_HANDLER(ID_VIEW_MENU, OnViewMenu)
 			COMMAND_ID_HANDLER(ID_VIEW_TOOLBAR, OnViewToolBar)
@@ -178,6 +179,7 @@ class MainFrame
 		LRESULT OnEditPaste(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 		LRESULT OnEditStopScrolling(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 		LRESULT OnEditRenameTab(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+		LRESULT OnEditWindowSize(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 		LRESULT OnEditSettings(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 		LRESULT OnViewMenu(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);

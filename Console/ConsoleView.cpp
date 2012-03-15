@@ -1039,6 +1039,24 @@ bool ConsoleView::GetMaxRect(CRect& maxClientRect)
 
 //////////////////////////////////////////////////////////////////////////////
 
+void ConsoleView::GetRectFromConsoleSize(CRect& clientRect, DWORD dwRows, DWORD dwColumns)
+{
+	StylesSettings& stylesSettings = g_settingsHandler->GetAppearanceSettings().stylesSettings;
+
+	clientRect.left		= 0;
+	clientRect.top		= 0;
+	clientRect.right	= dwColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder;
+	clientRect.bottom	= dwRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder;
+
+	if (m_bShowVScroll) clientRect.right	+= m_nVScrollWidth;
+	if (m_bShowHScroll) clientRect.bottom	+= m_nHScrollWidth;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+
 void ConsoleView::AdjustRectAndResize(CRect& clientRect, DWORD dwResizeWindowEdge, bool bGetClientRect)
 {
 	StylesSettings& stylesSettings = g_settingsHandler->GetAppearanceSettings().stylesSettings;

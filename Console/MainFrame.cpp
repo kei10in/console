@@ -6,6 +6,7 @@
 #include "ConsoleView.h"
 #include "ConsoleException.h"
 #include "DlgRenameTab.h"
+#include "DlgWindowSize.h"
 #include "DlgSettingsMain.h"
 #include "DlgCredentials.h"
 #include "MainFrame.h"
@@ -1360,6 +1361,37 @@ LRESULT MainFrame::OnEditRenameTab(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 		UpdateTabTitle(m_activeView, strTabTitle);
 
 		if (windowSettings.bUseTabTitles) SetWindowText(m_activeView->GetTitle());
+	}
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+LRESULT MainFrame::OnEditWindowSize(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	if (!m_activeView) return 0;
+
+	DlgWindowSize dlg(m_dwRows, m_dwColumns);
+
+	if (dlg.DoModal() == IDOK)
+	{
+
+		CRect clientRect(0, 0, 0, 0);
+		m_activeView->GetRectFromConsoleSize(clientRect, dlg.GetRows(), dlg.GetColumns());
+
+		AdjustWindowRect(clientRect);
+
+		SetWindowPos(
+			0, 
+			0, 
+			0, 
+			clientRect.Width(), 
+			clientRect.Height() + 4, 
+			SWP_NOMOVE|SWP_NOZORDER);
 	}
 
 	return 0;

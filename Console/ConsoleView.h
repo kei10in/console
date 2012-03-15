@@ -101,6 +101,7 @@ class ConsoleView
 
 		void GetRect(CRect& clientRect);
 		bool GetMaxRect(CRect& maxClientRect);
+		void GetRectFromConsoleSize(CRect& clientRect, DWORD dwRows, DWORD dwColumns);
 		void AdjustRectAndResize(CRect& clientRect, DWORD dwResizeWindowEdge, bool bGetClientRect);
 
 		ConsoleHandler& GetConsoleHandler() { return m_consoleHandler; }
