@@ -47,6 +47,7 @@ ConsoleView::ConsoleView(MainFrame& mainFrame, DWORD dwTabIndex, const wstring& 
 , m_bShowHScroll(false)
 , m_nVScrollWidth(::GetSystemMetrics(SM_CXVSCROLL))
 , m_nHScrollWidth(::GetSystemMetrics(SM_CXHSCROLL))
+, m_nVScrollMax(0)
 , m_strTitle(g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex]->strTitle.c_str())
 , m_strUser()
 , bigIcon()
@@ -850,8 +851,14 @@ LRESULT ConsoleView::OnUpdateConsoleView(UINT /*uMsg*/, WPARAM wParam, LPARAM /*
 	{
 		SCROLLINFO si;
 		si.cbSize = sizeof(si); 
-		si.fMask  = SIF_POS; 
+		si.fMask  = SIF_POS | SIF_RANGE; 
 		si.nPos   = consoleInfo->csbi.srWindow.Top; 
+		if (m_nVScrollMax < consoleInfo->csbi.srWindow.Bottom)
+		{
+			m_nVScrollMax = consoleInfo->csbi.srWindow.Bottom;
+		}
+		si.nMax   = m_nVScrollMax;
+		si.nMin   = 0;
 		::FlatSB_SetScrollInfo(m_hWnd, SB_VERT, &si, TRUE);
 
 /*
@@ -1615,10 +1622,26 @@ void ConsoleView::InitializeScrollbars()
 		// set vertical scrollbar stuff
 		SCROLLINFO	si ;
 
+		si.cbSize	= sizeof(SCROLLINFO);
+		si.fMask	= SIF_POS;
+		::FlatSB_GetScrollInfo(m_hWnd, SB_VERT, &si);
+
 		si.cbSize	= sizeof(SCROLLINFO) ;
 		si.fMask	= SIF_PAGE | SIF_RANGE ;
 		si.nPage	= consoleParams->dwRows;
-		si.nMax		= consoleParams->dwBufferRows - 1;
+		if (0) // Skipped until the setting for this exists
+		{
+			m_nVScrollMax = consoleParams->dwBufferRows - 1;
+		}
+		else
+		{
+			if (m_nVScrollMax == 0 || m_nVScrollMax < consoleParams->dwRows - 1)
+			{
+				m_nVScrollMax = consoleParams->dwRows - 1;
+			}
+			DoScroll(SB_VERT, SB_THUMBPOSITION, si.nPos);
+		}
+		si.nMax		= m_nVScrollMax;
 		si.nMin		= 0 ;
 
 		::FlatSB_SetScrollInfo(m_hWnd, SB_VERT, &si, TRUE);
@@ -1695,7 +1718,12 @@ void ConsoleView::DoScroll(int nType, int nScrollCode, int nThumbPos)
 		default: 
 			return;
 	}
-	
+
+	if (nType == SB_VERT && nCurrentPos + nDelta + static_cast<int>(m_consoleHandler.GetConsoleParams()->dwRows) - 1 > m_nVScrollMax)
+	{
+		nDelta = m_nVScrollMax - nCurrentPos - (static_cast<int>(m_consoleHandler.GetConsoleParams()->dwRows) - 1);
+	}
+
 	if (nDelta != 0)
 	{
 		SharedMemory<SIZE>& newScrollPos = m_consoleHandler.GetNewScrollPos();
