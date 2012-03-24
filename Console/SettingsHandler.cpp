@@ -181,7 +181,7 @@ FontSettings::FontSettings()
 , bItalic(false)
 , fontSmoothing(fontSmoothDefault)
 , bUseColor(false)
-, crFontColor(0)
+, crFontColor(0xC0C0C0)
 {
 }
 
@@ -212,7 +212,7 @@ bool FontSettings::Load(const CComPtr<IXMLDOMElement>& pSettingsRoot)
 	if (FAILED(XmlHelper::GetDomElement(pFontElement, CComBSTR(L"color"), pColorElement))) return false;
 
 	XmlHelper::GetAttribute(pColorElement, CComBSTR(L"use"), bUseColor, false);
-	XmlHelper::GetRGBAttribute(pColorElement, crFontColor, RGB(0, 0, 0));
+	XmlHelper::GetRGBAttribute(pColorElement, crFontColor, RGB(0xC0, 0xC0, 0xC0));
 
 	return true;
 }
