@@ -48,7 +48,6 @@ class ConsoleView
 			MESSAGE_HANDLER(WM_SYSCHAR, OnConsoleFwdMsg)
 			MESSAGE_HANDLER(WM_DEADCHAR, OnConsoleFwdMsg)
 			MESSAGE_HANDLER(WM_SYSDEADCHAR, OnConsoleFwdMsg)
-			MESSAGE_HANDLER(WM_MOUSEWHEEL, OnConsoleFwdMsg)
 			MESSAGE_HANDLER(WM_VSCROLL, OnVScroll)
 			MESSAGE_HANDLER(WM_HSCROLL, OnHScroll)
 			MESSAGE_HANDLER(WM_LBUTTONDOWN, OnMouseButton)
@@ -61,6 +60,7 @@ class ConsoleView
 			MESSAGE_HANDLER(WM_XBUTTONDOWN, OnMouseButton)
 			MESSAGE_HANDLER(WM_XBUTTONUP, OnMouseButton)
 			MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
+			MESSAGE_HANDLER(WM_MOUSEWHEEL, OnMouseWheel)
 			MESSAGE_HANDLER(WM_MOUSEACTIVATE, OnMouseActivate)
 			MESSAGE_HANDLER(WM_TIMER, OnTimer)
 			MESSAGE_HANDLER(WM_INPUTLANGCHANGEREQUEST, OnInputLangChangeRequest)
@@ -87,6 +87,7 @@ class ConsoleView
 		LRESULT OnScrollCommand(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled);
 		LRESULT OnMouseButton(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
 		LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+		LRESULT OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
 		LRESULT OnMouseActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
 		LRESULT OnTimer(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 		LRESULT OnInputLangChangeRequest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -191,6 +192,7 @@ class ConsoleView
 		int		m_nVScrollWidth;
 		int		m_nHScrollWidth;
 		int		m_nVScrollMax;
+		int		m_nVWheelDelta;
 
 		CString	m_strTitle;
 		CString	m_strUser;

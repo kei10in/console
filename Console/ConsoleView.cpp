@@ -48,6 +48,7 @@ ConsoleView::ConsoleView(MainFrame& mainFrame, DWORD dwTabIndex, const wstring& 
 , m_nVScrollWidth(::GetSystemMetrics(SM_CXVSCROLL))
 , m_nHScrollWidth(::GetSystemMetrics(SM_CXHSCROLL))
 , m_nVScrollMax(0)
+, m_nVWheelDelta(0)
 , m_strTitle(g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex]->strTitle.c_str())
 , m_strUser()
 , bigIcon()
@@ -657,6 +658,65 @@ LRESULT ConsoleView::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	{
 		bHandled = FALSE;
 	}
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+LRESULT ConsoleView::OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+	UINT						uKeys			= GET_KEYSTATE_WPARAM(wParam);
+	int							nWheelDelta		= GET_WHEEL_DELTA_WPARAM(wParam);
+
+	MouseSettings::Action		mouseAction;
+	int							nScrollType;
+	UINT						uScrollAmount;
+	int							nScrollDelta;
+
+	// get modifiers
+	if (uKeys & MK_CONTROL)			mouseAction.modifiers |= MouseSettings::mkCtrl;
+	if (uKeys & MK_SHIFT)			mouseAction.modifiers |= MouseSettings::mkShift;
+	if (GetKeyState(VK_MENU) < 0)	mouseAction.modifiers |= MouseSettings::mkAlt;
+
+	// get scroll type
+	switch (uMsg)
+	{
+		case WM_MOUSEWHEEL :
+			nScrollType = SB_VERT;
+			if (!SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &uScrollAmount, 0))
+				uScrollAmount = 3;
+			m_nVWheelDelta += nWheelDelta * uScrollAmount;
+			nScrollDelta    = m_nVWheelDelta;
+			m_nVWheelDelta %= WHEEL_DELTA;
+			nScrollDelta    = (nScrollDelta - m_nVWheelDelta) / WHEEL_DELTA;
+			break;
+
+		default :
+			return 0;
+	}
+
+	if (nScrollDelta != 0)
+	{
+		if (mouseAction.modifiers & MouseSettings::mkShift)
+		{
+			ScrollSettings& scrollSettings = g_settingsHandler->GetBehaviorSettings().scrollSettings;
+			if (scrollSettings.dwPageScrollRows > 0)
+			{
+				nScrollDelta *= static_cast<int>(scrollSettings.dwPageScrollRows);
+			}
+			else
+			{
+				nScrollDelta *= (nScrollType == SB_VERT) ? static_cast<int>(m_consoleHandler.GetConsoleParams()->dwRows) : static_cast<int>(m_consoleHandler.GetConsoleParams()->dwColumns);
+			}
+		}
+		DoScroll(nScrollType, SB_THUMBPOSITION, ::FlatSB_GetScrollPos(m_hWnd, nScrollType) - nScrollDelta);
+	}
+
+	//::PostMessage(m_consoleHandler.GetConsoleParams()->hwndConsoleWindow, uMsg, wParam, lParam);
 
 	return 0;
 }
