@@ -688,8 +688,15 @@ LRESULT ConsoleView::OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM /*lParam*/, B
 	{
 		case WM_MOUSEWHEEL :
 			nScrollType = SB_VERT;
-			if (!SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &uScrollAmount, 0))
-				uScrollAmount = 3;
+			if (mouseAction.modifiers & MouseSettings::mkCtrl)
+			{
+				uScrollAmount = 1;
+			}
+			else
+			{
+				if (!SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &uScrollAmount, 0))
+					uScrollAmount = 3;
+			}
 			m_nVWheelDelta += nWheelDelta * uScrollAmount;
 			nScrollDelta    = m_nVWheelDelta;
 			m_nVWheelDelta %= WHEEL_DELTA;
@@ -702,6 +709,23 @@ LRESULT ConsoleView::OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM /*lParam*/, B
 
 	if (nScrollDelta != 0)
 	{
+		if (mouseAction.modifiers & MouseSettings::mkCtrl)
+		{
+			// calculate new font size in the [5, 36] interval
+			DWORD size = max(5, min(36, m_appearanceSettings.fontSettings.dwSize + nScrollDelta));
+
+			// only if the new size is different (to avoid flickering at extremes)
+			if (m_appearanceSettings.fontSettings.dwSize != size)
+			{
+				// adjust the font size
+				m_appearanceSettings.fontSettings.dwSize = size;
+				RecreateOffscreenBuffers();
+				m_mainFrame.AdjustWindowSize(false);
+				Repaint(true);
+			}
+
+			return 0;
+		}
 		if (mouseAction.modifiers & MouseSettings::mkShift)
 		{
 			ScrollSettings& scrollSettings = g_settingsHandler->GetBehaviorSettings().scrollSettings;
@@ -1073,6 +1097,7 @@ bool ConsoleView::GetMaxRect(CRect& maxClientRect)
 	maxClientRect.right	= m_consoleHandler.GetConsoleParams()->dwMaxColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder;
 	maxClientRect.bottom= m_consoleHandler.GetConsoleParams()->dwMaxRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder;
 
+	/* TODO: Fix issues with multiple monitors, increasing then decreasing font size, etc.
 	CWindow desktopWindow(::GetDesktopWindow());
 	CRect	rectDesktop;
 	bool	bRecalc = false;
@@ -1096,6 +1121,7 @@ bool ConsoleView::GetMaxRect(CRect& maxClientRect)
 		maxClientRect.right	= m_consoleHandler.GetConsoleParams()->dwMaxColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder;
 		maxClientRect.bottom= m_consoleHandler.GetConsoleParams()->dwMaxRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder;
 	}
+	*/
 
 	if (m_bShowVScroll) maxClientRect.right	+= m_nVScrollWidth;
 	if (m_bShowHScroll) maxClientRect.bottom+= m_nHScrollWidth;
