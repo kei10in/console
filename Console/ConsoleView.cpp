@@ -668,7 +668,7 @@ LRESULT ConsoleView::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT ConsoleView::OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+LRESULT ConsoleView::OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	UINT						uKeys			= GET_KEYSTATE_WPARAM(wParam);
 	int							nWheelDelta		= GET_WHEEL_DELTA_WPARAM(wParam);
@@ -1706,7 +1706,7 @@ void ConsoleView::InitializeScrollbars()
 		}
 		else
 		{
-			if (m_nVScrollMax == 0 || m_nVScrollMax < consoleParams->dwRows - 1)
+			if (m_nVScrollMax == 0 || m_nVScrollMax < static_cast<int>(consoleParams->dwRows) - 1)
 			{
 				m_nVScrollMax = consoleParams->dwRows - 1;
 			}
