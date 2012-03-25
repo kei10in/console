@@ -89,7 +89,7 @@
 		</actions>
 	</mouse>
 	<tabs>
-		<tab title="Console2">
+		<tab title="Console">
 			<console shell="" init_dir=""/>
 			<cursor style="0" r="255" g="255" b="255"/>
 			<background type="0" r="0" g="0" b="0">
