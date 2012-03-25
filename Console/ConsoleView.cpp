@@ -912,7 +912,7 @@ LRESULT ConsoleView::OnUpdateConsoleView(UINT /*uMsg*/, WPARAM wParam, LPARAM /*
 	{
 		SCROLLINFO si;
 		si.cbSize = sizeof(si); 
-		si.fMask  = SIF_POS | SIF_RANGE; 
+		si.fMask  = SIF_POS | SIF_RANGE | SIF_DISABLENOSCROLL; 
 		si.nPos   = consoleInfo->csbi.srWindow.Top; 
 		if (m_nVScrollMax < consoleInfo->csbi.srWindow.Bottom)
 		{
@@ -1698,7 +1698,7 @@ void ConsoleView::InitializeScrollbars()
 		::FlatSB_GetScrollInfo(m_hWnd, SB_VERT, &si);
 
 		si.cbSize	= sizeof(SCROLLINFO) ;
-		si.fMask	= SIF_PAGE | SIF_RANGE ;
+		si.fMask	= SIF_PAGE | SIF_RANGE | SIF_DISABLENOSCROLL ;
 		si.nPage	= consoleParams->dwRows;
 		if (0) // Skipped until the setting for this exists
 		{
