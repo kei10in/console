@@ -20,6 +20,7 @@ CDC		ConsoleView::m_dcText(::CreateCompatibleDC(NULL));
 
 CBitmap	ConsoleView::m_bmpOffscreen;
 CBitmap	ConsoleView::m_bmpText;
+CSize	ConsoleView::m_sizePadding(0, 0);
 
 CFont	ConsoleView::m_fontText;
 CFont	ConsoleView::m_fontTextHigh;
@@ -1048,8 +1049,8 @@ void ConsoleView::GetRect(CRect& clientRect)
 
 	clientRect.left		= 0;
 	clientRect.top		= 0;
-	clientRect.right	= m_consoleHandler.GetConsoleParams()->dwColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder;
-	clientRect.bottom	= m_consoleHandler.GetConsoleParams()->dwRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder;
+	clientRect.right	= m_consoleHandler.GetConsoleParams()->dwColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder + m_sizePadding.cx;
+	clientRect.bottom	= m_consoleHandler.GetConsoleParams()->dwRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder + m_sizePadding.cy;
 
 	if (m_bShowVScroll) clientRect.right	+= m_nVScrollWidth;
 	if (m_bShowHScroll) clientRect.bottom	+= m_nHScrollWidth;
@@ -1143,8 +1144,18 @@ void ConsoleView::AdjustRectAndResize(CRect& clientRect, DWORD dwResizeWindowEdg
 	DWORD dwColumns	= (clientRect.Width() - 2*stylesSettings.dwInsideBorder) / m_nCharWidth;
 	DWORD dwRows	= (clientRect.Height() - 2*stylesSettings.dwInsideBorder) / m_nCharHeight;
 
-	clientRect.right	= clientRect.left + dwColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder;
-	clientRect.bottom	= clientRect.top + dwRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder;
+	if (bGetClientRect)
+	{
+		clientRect.right	= clientRect.left + dwColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder;
+		clientRect.bottom	= clientRect.top + dwRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder;
+		m_sizePadding.cx	= 0;
+		m_sizePadding.cy	= 0;
+	}
+	else
+	{
+		m_sizePadding.cx = clientRect.right - (clientRect.left + dwColumns*m_nCharWidth + 2*stylesSettings.dwInsideBorder);
+		m_sizePadding.cy = clientRect.bottom - (clientRect.top + dwRows*m_nCharHeight + 2*stylesSettings.dwInsideBorder);
+	}
 
 	// adjust for scrollbars
 	if (m_bShowVScroll) clientRect.right	+= m_nVScrollWidth;

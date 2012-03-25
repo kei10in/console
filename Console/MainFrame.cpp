@@ -1998,7 +1998,7 @@ void MainFrame::SetWindowStyles()
 	DWORD	dwStyle		= GetWindowLong(GWL_STYLE);
 	DWORD	dwExStyle	= GetWindowLong(GWL_EXSTYLE);
 
-	dwStyle &= ~WS_MAXIMIZEBOX;
+	//dwStyle &= ~WS_MAXIMIZEBOX;
 	if (!stylesSettings.bCaption)	dwStyle &= ~WS_CAPTION;
 	if (!stylesSettings.bResizable)	dwStyle &= ~WS_THICKFRAME;
 
@@ -2316,6 +2316,11 @@ void MainFrame::ResizeWindow()
 void MainFrame::AdjustWindowSize(bool bResizeConsole, bool bMaxOrRestore /*= false*/)
 {
 	CRect clientRect(0, 0, 0, 0);
+
+	if (IsZoomed())
+	{
+		bMaxOrRestore = true;
+	}
 
 	if (bResizeConsole)
 	{

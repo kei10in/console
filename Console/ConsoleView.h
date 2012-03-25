@@ -237,6 +237,7 @@ private:
 
 		static CBitmap					m_bmpOffscreen;
 		static CBitmap					m_bmpText;
+		static CSize					m_sizePadding;
 
 		static CFont					m_fontText;
 		static CFont					m_fontTextHigh;
