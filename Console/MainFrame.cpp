@@ -1557,6 +1557,34 @@ LRESULT MainFrame::OnDumpBuffer(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndC
 
 //////////////////////////////////////////////////////////////////////////////
 
+LRESULT MainFrame::OnPopupPopupMenu(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	POINT	pt;
+	CRect	windowRect;
+
+	GetClientRect(&windowRect);
+	ClientToScreen(&windowRect);
+
+	pt.x = windowRect.left;
+	pt.y = windowRect.top;
+
+	// adjust for the toolbar height
+	CReBarCtrl	rebar(m_hWndToolBar);
+	pt.y += rebar.GetBarHeight();
+	pt.y += GetTabAreaHeight();
+
+	//CPoint	screenPoint(pt);
+	//ClientToScreen(&screenPoint);
+	SendMessage(UM_SHOW_POPUP_MENU, 0, MAKELPARAM(pt.x, pt.y));
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+
 LRESULT MainFrame::OnHelp(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	::HtmlHelp(m_hWnd, (Helpers::GetModulePath(NULL) + wstring(L"console.chm")).c_str(), HH_DISPLAY_TOPIC, NULL);
