@@ -56,7 +56,8 @@ extern CAppModule _Module;
 #endif
 
 #include "CustomTabCtrl.h"
-#include "DotNetTabCtrl.h"
+#include "SFTabCtrl.h"
+//#include "DotNetTabCtrl.h"
 //#include "SimpleTabCtrls.h"
 //#include "SimpleDlgTabCtrls.h"
 #include "TabbedFrame.h"
