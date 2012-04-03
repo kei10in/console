@@ -1129,6 +1129,7 @@ HotKeys::HotKeys()
 
 	commands.push_back(shared_ptr<CommandData>(new CommandData(L"closetab",		ID_FILE_CLOSE_TAB,	L"Close tab")));
 	commands.push_back(shared_ptr<CommandData>(new CommandData(L"renametab",	ID_EDIT_RENAME_TAB,	L"Rename tab")));
+	commands.push_back(shared_ptr<CommandData>(new CommandData(L"windowsize",	ID_EDIT_WINDOW_SIZE,L"Window size")));
 
 	commands.push_back(shared_ptr<CommandData>(new CommandData(L"copy",			ID_EDIT_COPY,				L"Copy selection")));
 	commands.push_back(shared_ptr<CommandData>(new CommandData(L"clear_selection",ID_EDIT_CLEAR_SELECTION,	L"Clear selection")));
