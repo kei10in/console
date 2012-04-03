@@ -822,7 +822,7 @@ public:
 // Overrides from CCustomTabCtrl
 public:
 
-	void CalcSize_NonClient(LPRECT prcTabItemArea)
+	void CalcSize_NonClient(LPRECT /*prcTabItemArea*/)
 	{
 		// account for "non-client" areas
 		// TODO: For the short term, we will use this
