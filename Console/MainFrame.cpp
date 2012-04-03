@@ -1569,9 +1569,11 @@ LRESULT MainFrame::OnPopupPopupMenu(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
 	pt.y = windowRect.top;
 
 	// adjust for the toolbar height
+	ControlsSettings&	controlsSettings= g_settingsHandler->GetAppearanceSettings().controlsSettings;
 	CReBarCtrl	rebar(m_hWndToolBar);
 	pt.y += rebar.GetBarHeight();
-	pt.y += GetTabAreaHeight();
+	if (!controlsSettings.bTabsOnBottom)
+		pt.y += GetTabAreaHeight();
 
 	//CPoint	screenPoint(pt);
 	//ClientToScreen(&screenPoint);
