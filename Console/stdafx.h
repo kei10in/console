@@ -57,7 +57,6 @@ extern CAppModule _Module;
 
 #define CDotNetTabCtrl CSFTabCtrl
 #include "CustomTabCtrl.h"
-#include "SFTabCtrl.h"
 //#include "DotNetTabCtrl.h"
 //#include "SimpleTabCtrls.h"
 //#include "SimpleDlgTabCtrls.h"

@@ -27,15 +27,90 @@
 #include "CustomTabCtrl.h"
 #endif
 
+#include "ConsoleView.h"
+
 // NOTE: If you are compiling under VC7, be sure to put the following in
 // your precompiled header:
 //
 //extern "C" const int _fltused = 0;
 
-template<typename T, typename TItem = CCustomTabItem, class TBase = ATL::CWindow, class TWinTraits = CCustomTabCtrlWinTraits>
-class CSFTabCtrlImpl : 
-	public CCustomTabCtrl<T, TItem, TBase, TWinTraits>
+// Template derived Tab Item class that stores a pointer to a ConsoleView
+template <class TItem = CCustomTabItem>
+class CSFTabItem :
+	public TItem
 {
+protected:
+	typedef TItem baseClass;
+
+// Member variables (in addition to CCustomTabItem ones)
+protected:
+	shared_ptr<ConsoleView>	m_consoleView;
+
+// Constructors/Destructors
+public:
+	CSFTabItem() :
+		m_consoleView()
+	{
+	}
+
+	CSFTabItem(const CSFTabItem& rhs)
+	{
+		*this = rhs;
+	}
+
+	virtual ~CSFTabItem()
+	{
+	}
+
+	const CSFTabItem& operator=(const CSFTabItem& rhs)
+	{
+		baseClass::operator=(rhs);
+		if(&rhs != this)
+		{
+			m_consoleView = rhs.m_consoleView;
+		}
+		return *this;
+	}
+
+// Accessors
+public:
+
+	shared_ptr<ConsoleView> GetConsoleView() const
+	{
+		return m_consoleView;
+	}
+	bool SetConsoleView(shared_ptr<ConsoleView> consoleView = shared_ptr<ConsoleView>())
+	{
+		m_consoleView = consoleView;
+		return true;
+	}
+
+// Methods:
+public:
+	bool UsingConsoleView() const
+	{
+		return (m_consoleView);
+	}
+
+	bool MatchItem(CSFTabItem* pItem, DWORD eFlags) const
+	{
+		bool bMatch = baseClass::MatchItem(pItem, eFlags);
+
+		if(bMatch)
+		{
+			*pItem = *this;
+		}
+
+		return bMatch;
+	}
+};
+
+template<typename T, typename TItemBase = CCustomTabItem, class TBase = ATL::CWindow, class TWinTraits = CCustomTabCtrlWinTraits>
+class CSFTabCtrlImpl : 
+	public CCustomTabCtrl<T, CSFTabItem<TItemBase>, TBase, TWinTraits>
+{
+public:
+	typedef CSFTabItem<TItemBase> TItem;
 protected:
 	typedef CSFTabCtrlImpl<T, TItem, TBase, TWinTraits> thisClass;
 	typedef CCustomTabCtrl<T, TItem, TBase, TWinTraits> customTabClass;

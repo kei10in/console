@@ -1805,7 +1805,9 @@ bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir 
 	CString strTabTitle;
 	consoleView->GetWindowText(strTabTitle);
 
-	AddTabWithIcon(*consoleView, strTabTitle, consoleView->GetIcon(false));
+	int nTabIndex = AddTabWithIcon(*consoleView, strTabTitle, consoleView->GetIcon(false));
+	if (nTabIndex > -1)
+		m_TabCtrl.GetItem(nTabIndex)->SetConsoleView(consoleView);
 	DisplayTab(hwndConsoleView, FALSE);
 	::SetForegroundWindow(m_hWnd);
 
