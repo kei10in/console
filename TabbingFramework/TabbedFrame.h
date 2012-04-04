@@ -845,7 +845,7 @@ public:
 
 template <
 	class T,
-	class TTabCtrl = CSFTabCtrl<CTabViewTabItem>,
+	class TTabCtrl = CDotNetTabCtrl<CTabViewTabItem>,
 	class TBase = WTL::CFrameWindowImpl<T, ATL::CWindow, ATL::CFrameWinTraits> >
 class CTabbedFrameImpl :
 	public TBase,
