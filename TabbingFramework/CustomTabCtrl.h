@@ -1231,6 +1231,7 @@ public:
 			::SetCursor(m_hCursorNoDrop);
 		}
 
+		DWORD dwStyle = this->GetStyle();
 		CTCHITTESTINFO tchti = { 0 };
 		tchti.pt = ptCursor;
 		int index = pT->HitTest(&tchti);
@@ -1243,6 +1244,11 @@ public:
 			
 			if((m_iDragItem < index) && (ptCursor.x > itemMiddlePointX))
 			{
+				if( CTCS_HOTTRACK == (dwStyle & CTCS_HOTTRACK) &&
+					ectcHotTrack_TabItem == (m_dwState & ectcHotTrack))
+				{
+					this->ClearCurrentHotTracking(false);
+				}
 				// They're dragging an item from left to right,
 				// and have dragged it over the half way mark to the right
 				pT->MoveItem(m_iDragItem, index, true, false);
@@ -1250,6 +1256,11 @@ public:
 			}
 			else if((m_iDragItem > index) && (ptCursor.x < itemMiddlePointX))
 			{
+				if( CTCS_HOTTRACK == (dwStyle & CTCS_HOTTRACK) &&
+					ectcHotTrack_TabItem == (m_dwState & ectcHotTrack))
+				{
+					this->ClearCurrentHotTracking(false);
+				}
 				// They're dragging an item from right to left,
 				// and have dragged it over the half way mark to the left
 				pT->MoveItem(m_iDragItem, index, true, false);
@@ -1258,7 +1269,6 @@ public:
 		}
 
 		// Now scroll if necessary
-		DWORD dwStyle = this->GetStyle();
 		if(CTCS_SCROLL == (dwStyle & CTCS_SCROLL))
 		{
 			RECT rcLeftScrollZone = {rcClient.left, rcClient.top, (m_rcTabItemArea.left + CTCD_SCROLLZONEWIDTH), rcClient.bottom};
