@@ -359,7 +359,10 @@ public:
 			if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 			{
 				rc.bottom = rc.top + 2;
-				dc.FillSolidRect(&rc, dwStyle & CSFT_STYLE_COLOR_TABS ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_EDGE) : lpNMCustomDraw->clrBtnFace);
+				if(dwStyle & CSFT_STYLE_COLOR_TABS)
+					PaintBackground(consoleView, dc, rc, 0, CSFT_FADE_EDGE);
+				else
+					dc.FillSolidRect(&rc, lpNMCustomDraw->clrBtnFace);
 
 				CPenHandle penOld = dc.SelectPen(penText);
 
@@ -371,7 +374,10 @@ public:
 			else
 			{
 				rc.top = rc.bottom - 2;
-				dc.FillSolidRect(&rc, dwStyle & CSFT_STYLE_COLOR_TABS ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_EDGE) : lpNMCustomDraw->clrBtnFace);
+				if(dwStyle & CSFT_STYLE_COLOR_TABS)
+					PaintBackground(consoleView, dc, rc, 0, CSFT_FADE_EDGE);
+				else
+					dc.FillSolidRect(&rc, lpNMCustomDraw->clrBtnFace);
 
 				CPenHandle penOld = dc.SelectPen(penText);
 
@@ -432,7 +438,7 @@ public:
 				rcTab.top-=2;
 			else
 				rcTab.bottom+=2;
-			dc.FillSolidRect(&rcTab, consoleView->GetConsoleColor(0, true));
+			PaintBackground(consoleView, dc, rcTab, m_iScrollOffset);
 			if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 				rcTab.top+=2;
 			else
@@ -440,7 +446,10 @@ public:
 		}
 		else
 		{
-			dc.FillSolidRect(&rcTab, dwStyle & CSFT_STYLE_COLOR_TABS ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_ACTIVE) : lpNMCustomDraw->clrSelectedTab);
+			if(dwStyle & CSFT_STYLE_COLOR_TABS)
+				PaintBackground(consoleView, dc, rcTab, m_iScrollOffset, CSFT_FADE_ACTIVE);
+			else
+				dc.FillSolidRect(&rcTab, lpNMCustomDraw->clrSelectedTab);
 		}
 		if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 			rcTab.bottom++;
@@ -500,15 +509,23 @@ public:
 		if(bHighlighted)
 			clrBackground = lpNMCustomDraw->clrHighlight;
 		else if(bHot)
-			clrBackground = dwStyle & CSFT_STYLE_COLOR_TABS ? consoleView->GetConsoleColor(0, true) : lpNMCustomDraw->clrSelectedTab;
+			clrBackground = lpNMCustomDraw->clrSelectedTab;
 		else
-			clrBackground = dwStyle & CSFT_STYLE_COLOR_TABS ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_INACTIVE) : lpNMCustomDraw->clrBtnShadow;
+			clrBackground = lpNMCustomDraw->clrBtnShadow;
 		RECT rcHighlight = {rcTab.left+1, rcTab.top+1, rcTab.right-1, rcTab.bottom-1};
 		if(nSelected == -1)
 			rcHighlight.right += 1;
 		else if(nSelected == 1)
 			rcHighlight.left -= 1;
-		dc.FillSolidRect(&rcHighlight, clrBackground);
+		if((dwStyle & CSFT_STYLE_COLOR_TABS) == CSFT_STYLE_COLOR_TABS && !bHighlighted)
+		{
+			if(bHot)
+				PaintBackground(consoleView, dc, rcHighlight, m_iScrollOffset);
+			else
+				PaintBackground(consoleView, dc, rcHighlight, m_iScrollOffset, CSFT_FADE_INACTIVE);
+		}
+		else
+			dc.FillSolidRect(&rcHighlight, clrBackground);
 
 		WTL::CPen penText;
 		if(bHot)
@@ -931,6 +948,17 @@ public:
 	{
 		return RGB(((int)GetRValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetGValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetBValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8);
 	}
+
+	void PaintBackground(shared_ptr<ConsoleView> consoleView, WTL::CDCHandle& dc, RECT& rect, int nScrollOffset, int nFadeAmount = 0)
+	{
+		RECT rcScreen;
+		this->GetClientRect(&rcScreen);
+		this->ClientToScreen(&rcScreen);
+		rcScreen.right = nScrollOffset;
+		rcScreen.bottom = 0;
+		consoleView->PaintBackground(dc, rect, rcScreen, nFadeAmount);
+	}
+
 
 // Overrides from CCustomTabCtrl
 public:

@@ -1907,10 +1907,10 @@ void ConsoleView::RepaintText(CDC& dc)
 		CRect	rectWindow;
 		GetClientRect(&rectWindow);
 
-		g_imageHandler->UpdateImageBitmap(dc, rectWindow, m_background);
-
 		if (m_tabData->imageData.bRelative)
 		{
+			g_imageHandler->UpdateImageBitmap(dc, rectWindow, m_background);
+
 			CPoint	pointClientScreen(0, 0);
 			ClientToScreen(&pointClientScreen);
 
@@ -1926,6 +1926,10 @@ void ConsoleView::RepaintText(CDC& dc)
 		}
 		else
 		{
+			rectWindow.bottom += m_mainFrame.GetTabAreaHeight();
+			g_imageHandler->UpdateImageBitmap(dc, rectWindow, m_background);
+			ControlsSettings& controlsSettings = g_settingsHandler->GetAppearanceSettings().controlsSettings;
+
 			dc.BitBlt(
 				bitmapRect.left, 
 				bitmapRect.top, 
@@ -1933,7 +1937,7 @@ void ConsoleView::RepaintText(CDC& dc)
 				bitmapRect.bottom, 
 				m_background->dcImage, 
 				bitmapRect.left, 
-				bitmapRect.top, 
+				bitmapRect.top + (!controlsSettings.bTabsOnBottom ? m_mainFrame.GetTabAreaHeight() : 0), 
 				SRCCOPY);
 		}
 	}
@@ -2117,8 +2121,14 @@ void ConsoleView::RepaintTextChanges(CDC& dc)
 
 	CRect	rectWindow;
 	GetClientRect(&rectWindow);
+	ControlsSettings& controlsSettings = g_settingsHandler->GetAppearanceSettings().controlsSettings;
 
-	if (m_tabData->backgroundImageType != bktypeNone) g_imageHandler->UpdateImageBitmap(dc, rectWindow, m_background);
+	if (m_tabData->backgroundImageType != bktypeNone)
+	{
+		if (!m_tabData->imageData.bRelative)
+			rectWindow.bottom += m_mainFrame.GetTabAreaHeight();
+		g_imageHandler->UpdateImageBitmap(dc, rectWindow, m_background);
+	}
 
 	for (DWORD i = 0; i < m_consoleHandler.GetConsoleParams()->dwRows; ++i)
 	{
@@ -2170,7 +2180,7 @@ void ConsoleView::RepaintTextChanges(CDC& dc)
 							rect.Height(),
 							m_background->dcImage, 
 							rect.left, 
-							rect.top, 
+							rect.top + (!controlsSettings.bTabsOnBottom ? m_mainFrame.GetTabAreaHeight() : 0), 
 							SRCCOPY);
 					}
 				}
@@ -2229,6 +2239,104 @@ COLORREF ConsoleView::GetConsoleColor(int nColor, bool bBackground /*= false*/)
 	}
 
 	return (m_appearanceSettings.fontSettings.bUseColor || (nColor & 0xF) == 0x7) ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[nColor & 0xF];
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+void ConsoleView::PaintBackground(WTL::CDCHandle& dc, RECT& rect, RECT& rcScreen, int nFadeAmount)
+{
+	CRect crect(&rect);
+
+	if (m_tabData->backgroundImageType == bktypeNone)
+	{
+		COLORREF clrBackground = m_tabData->crBackgroundColor;
+		clrBackground = RGB(((int)GetRValue(clrBackground) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetGValue(clrBackground) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetBValue(clrBackground) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8);
+		dc.FillSolidRect(&rect, clrBackground);
+	}
+	else
+	{
+		CRect	rectWindow;
+		GetClientRect(&rectWindow);
+
+		if (!m_tabData->imageData.bRelative)
+			rectWindow.bottom += m_mainFrame.GetTabAreaHeight();
+		g_imageHandler->UpdateImageBitmap(m_dcText, rectWindow, m_background);
+
+		if (m_tabData->imageData.bRelative)
+		{
+			CRect rcClient;
+			GetClientRect(&rcClient);
+			if (crect.left + rcScreen.right < 0)
+				crect.left = -rcScreen.right;
+			if (crect.right  + rcScreen.right > rcClient.right)
+				crect.right = rcClient.right - rcScreen.right;
+
+			dc.FillSolidRect(&rect, m_background->imageData.crTint);
+			BLENDFUNCTION bf;
+			bf.BlendOp = AC_SRC_OVER;
+			bf.BlendFlags = 0;
+			bf.SourceConstantAlpha = 255 - (BYTE)nFadeAmount;
+			bf.AlphaFormat = 0;
+			if (!dc.AlphaBlend(
+				crect.left, 
+				crect.top, 
+				crect.Width(), 
+				crect.Height(), 
+				m_background->dcImage, 
+				crect.left + rcScreen.left + rcScreen.right - ::GetSystemMetrics(SM_XVIRTUALSCREEN), 
+				crect.top + rcScreen.top + rcScreen.bottom - ::GetSystemMetrics(SM_YVIRTUALSCREEN), 
+				crect.Width(), 
+				crect.Height(), 
+				bf))
+				dc.BitBlt(
+					crect.left, 
+					crect.top, 
+					crect.Width(), 
+					crect.Height(), 
+					m_background->dcImage, 
+					crect.left + rcScreen.left + rcScreen.right - ::GetSystemMetrics(SM_XVIRTUALSCREEN), 
+					crect.top + rcScreen.top + rcScreen.bottom - ::GetSystemMetrics(SM_YVIRTUALSCREEN), 
+					SRCCOPY);
+		}
+		else
+		{
+			CPoint	pointClientScreen(0, 0);
+			ControlsSettings& controlsSettings = g_settingsHandler->GetAppearanceSettings().controlsSettings;
+			if (controlsSettings.bTabsOnBottom)
+			{
+				ClientToScreen(&pointClientScreen);
+				pointClientScreen.Offset(-rcScreen.left, -rcScreen.top);
+			}
+
+			CRect rcClient;
+			GetClientRect(&rcClient);
+			if (crect.left - pointClientScreen.x + rcScreen.right < 0)
+				crect.left = pointClientScreen.x - rcScreen.right;
+			if (crect.right - pointClientScreen.x + rcScreen.right > rcClient.right)
+				crect.right = rcClient.right + pointClientScreen.x - rcScreen.right;
+
+			BLENDFUNCTION bf;
+			bf.BlendOp = AC_SRC_OVER;
+			bf.BlendFlags = 0;
+			bf.SourceConstantAlpha = 255 - (BYTE)nFadeAmount;
+			bf.AlphaFormat = 0;
+			dc.FillSolidRect(&rect, m_background->imageData.crTint);
+			dc.AlphaBlend(
+				crect.left, 
+				crect.top, 
+				crect.Width(),
+				crect.Height(),
+				m_background->dcImage, 
+				crect.left - pointClientScreen.x + rcScreen.right, 
+				crect.top - pointClientScreen.y + rcScreen.bottom, 
+				crect.Width(), 
+				crect.Height(), 
+				bf);
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////

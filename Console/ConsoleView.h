@@ -117,6 +117,7 @@ class ConsoleView
 		void Repaint(bool bFullRepaint);
 		void MainframeMoving();
 		COLORREF GetConsoleColor(int nColor, bool bBackground = false);
+		void ConsoleView::PaintBackground(WTL::CDCHandle& dc, RECT& rect, RECT& rcScreen, int nFadeAmount = 0);
 
 		void SetResizing(bool bResizing);
 		void SetActive(bool bActive);
