@@ -1975,7 +1975,7 @@ void ConsoleView::RepaintText(CDC& dc)
 		attrBG = (m_screenBuffer[dwOffset].charInfo.Attributes & 0xFF) >> 4;
 		
 		// here we decide how to paint text over the background
-		if (m_consoleSettings.consoleColors[attrBG] == RGB(0, 0, 0))
+		if (attrBG == 0)
 		{
 			nBkMode		= TRANSPARENT;
 		}
@@ -2020,7 +2020,7 @@ void ConsoleView::RepaintText(CDC& dc)
 			
 			attrBG = (m_screenBuffer[dwOffset].charInfo.Attributes & 0xFF) >> 4;
 
-			if (m_consoleSettings.consoleColors[attrBG] == RGB(0, 0, 0))
+			if (attrBG == 0)
 			{
 				if (nBkMode != TRANSPARENT)
 				{
@@ -2178,7 +2178,7 @@ void ConsoleView::RepaintTextChanges(CDC& dc)
 				attrBG = (m_screenBuffer[dwOffset].charInfo.Attributes & 0xFF) >> 4;
 
 				// here we decide how to paint text over the background
-				if (m_consoleSettings.consoleColors[attrBG] == RGB(0, 0, 0))
+				if (attrBG == 0)
 				{
 					dc.SetBkMode(TRANSPARENT);
 				}
@@ -2218,7 +2218,7 @@ COLORREF ConsoleView::GetConsoleColor(int nColor, bool bBackground /*= false*/)
 {
 	if (bBackground)
 	{
-		if (m_consoleSettings.consoleColors[nColor & 0xF] == RGB(0, 0, 0))
+		if ((nColor & 0xF) == 0)
 		{
 			return m_tabData->crBackgroundColor;
 		}
