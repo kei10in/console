@@ -2214,6 +2214,28 @@ void ConsoleView::RepaintTextChanges(CDC& dc)
 
 /////////////////////////////////////////////////////////////////////////////
 
+COLORREF ConsoleView::GetConsoleColor(int nColor, bool bBackground /*= false*/)
+{
+	if (bBackground)
+	{
+		if (m_consoleSettings.consoleColors[nColor & 0xF] == RGB(0, 0, 0))
+		{
+			return m_tabData->crBackgroundColor;
+		}
+		else
+		{
+			return m_consoleSettings.consoleColors[nColor & 0xF];
+		}
+	}
+
+	return (m_appearanceSettings.fontSettings.bUseColor || (nColor & 0xF) == 0x7) ? m_appearanceSettings.fontSettings.crFontColor : m_consoleSettings.consoleColors[nColor & 0xF];
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+
 void ConsoleView::BitBltOffscreen(bool bOnlyCursor /*= false*/)
 {
 	CRect			rectBlit;

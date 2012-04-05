@@ -116,6 +116,7 @@ class ConsoleView
 		void RecreateOffscreenBuffers();
 		void Repaint(bool bFullRepaint);
 		void MainframeMoving();
+		COLORREF GetConsoleColor(int nColor, bool bBackground = false);
 
 		void SetResizing(bool bResizing);
 		void SetActive(bool bActive);

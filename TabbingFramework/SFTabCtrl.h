@@ -29,6 +29,12 @@
 
 #include "ConsoleView.h"
 
+// Fade levels for tab colors (0 - 255)
+#define CSFT_FADE_EDGE     16
+#define CSFT_FADE_ACTIVE   32
+#define CSFT_FADE_INACTIVE 96
+#define CSFT_FADE_BORDER   128
+
 // NOTE: If you are compiling under VC7, be sure to put the following in
 // your precompiled header:
 //
@@ -118,6 +124,7 @@ protected:
 protected:
 	CBrush m_hbrBackground;
 	COLORREF m_clrTextInactiveTab, m_clrSelectedTab;
+	bool m_bUseTabColors;
 
 	signed char m_nFontSizeTextTopOffset;
 
@@ -128,6 +135,7 @@ public:
 	CSFTabCtrlImpl() :
 		m_clrTextInactiveTab(::GetSysColor(COLOR_GRAYTEXT)),
 		m_clrSelectedTab(::GetSysColor(COLOR_BTNFACE)),
+		m_bUseTabColors(false),
 		m_nFontSizeTextTopOffset(0),
 		m_nMinWidthToDisplayText(12)
 	{
@@ -341,13 +349,17 @@ public:
 			// Connect with the client area.
 			DWORD dwStyle = this->GetStyle();
 
+			CPen penText;
+			TItem* pItem = GetItem(m_iCurSel);
+			if(!pItem) return;
+			shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
+			penText.CreatePen(PS_SOLID, 1, m_bUseTabColors ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_BORDER) : lpNMCustomDraw->clrBtnText);
+
 			if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 			{
 				rc.bottom = rc.top + 2;
-				dc.FillSolidRect(&rc, lpNMCustomDraw->clrBtnFace);
+				dc.FillSolidRect(&rc, m_bUseTabColors ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_EDGE) : lpNMCustomDraw->clrBtnFace);
 
-				CPen penText;
-				penText.CreatePen(PS_SOLID, 1, lpNMCustomDraw->clrBtnText);
 				CPenHandle penOld = dc.SelectPen(penText);
 
 				dc.MoveTo(rc.left, rc.bottom);
@@ -358,10 +370,8 @@ public:
 			else
 			{
 				rc.top = rc.bottom - 2;
-				dc.FillSolidRect(&rc, lpNMCustomDraw->clrBtnFace);
+				dc.FillSolidRect(&rc, m_bUseTabColors ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_EDGE) : lpNMCustomDraw->clrBtnFace);
 
-				CPen penText;
-				penText.CreatePen(PS_SOLID, 1, lpNMCustomDraw->clrBtnText);
 				CPenHandle penOld = dc.SelectPen(penText);
 
 				dc.MoveTo(rc.left, rc.top-1);
@@ -403,6 +413,9 @@ public:
 		bool bHot = (CDIS_HOT == (lpNMCustomDraw->nmcd.uItemState & CDIS_HOT));
 
 		WTL::CDCHandle dc(lpNMCustomDraw->nmcd.hdc);
+		TItem* pItem = GetItem(lpNMCustomDraw->nmcd.dwItemSpec);
+		if(!pItem) return;
+		shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
 
 		if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 			rcTab.bottom++;
@@ -412,9 +425,21 @@ public:
 		{
 			dc.FillSolidRect(&rcTab, lpNMCustomDraw->clrHighlight);
 		}
+		else if(bHot && m_bUseTabColors)
+		{
+			if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
+				rcTab.top-=2;
+			else
+				rcTab.bottom+=2;
+			dc.FillSolidRect(&rcTab, consoleView->GetConsoleColor(0, true));
+			if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
+				rcTab.top+=2;
+			else
+				rcTab.bottom-=2;
+		}
 		else
 		{
-			dc.FillSolidRect(&rcTab, lpNMCustomDraw->clrSelectedTab);
+			dc.FillSolidRect(&rcTab, m_bUseTabColors ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_ACTIVE) : lpNMCustomDraw->clrSelectedTab);
 		}
 		if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 			rcTab.bottom++;
@@ -423,9 +448,9 @@ public:
 
 		WTL::CPen penText;
 		if(bHot)
-			penText.CreatePen(PS_SOLID, 1, lpNMCustomDraw->clrHighlightHotTrack);
+			penText.CreatePen(PS_SOLID, 1, m_bUseTabColors ? lpNMCustomDraw->clrBtnText : lpNMCustomDraw->clrHighlightHotTrack);
 		else
-			penText.CreatePen(PS_SOLID, 1, lpNMCustomDraw->clrBtnText);
+			penText.CreatePen(PS_SOLID, 1, lpNMCustomDraw->clrTextSelected);
 
 		if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 		{
@@ -465,13 +490,18 @@ public:
 		int nItem = (int)lpNMCustomDraw->nmcd.dwItemSpec;
 		int nSelected = nItem - m_iCurSel;
 		WTL::CDCHandle dc( lpNMCustomDraw->nmcd.hdc );
+		TItem* pItem = GetItem(nItem);
+		if(!pItem) return;
+		shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
 
 
-		COLORREF clrBackground = lpNMCustomDraw->clrBtnShadow;
+		COLORREF clrBackground;
 		if(bHighlighted)
 			clrBackground = lpNMCustomDraw->clrHighlight;
 		else if(bHot)
-			clrBackground = lpNMCustomDraw->clrSelectedTab;
+			clrBackground = m_bUseTabColors ? consoleView->GetConsoleColor(0, true) : lpNMCustomDraw->clrSelectedTab;
+		else
+			clrBackground = m_bUseTabColors ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_INACTIVE) : lpNMCustomDraw->clrBtnShadow;
 		RECT rcHighlight = {rcTab.left+1, rcTab.top+1, rcTab.right-1, rcTab.bottom-1};
 		if(nSelected == -1)
 			rcHighlight.right += 1;
@@ -481,7 +511,7 @@ public:
 
 		WTL::CPen penText;
 		if(bHot)
-			penText.CreatePen(PS_SOLID, 1, lpNMCustomDraw->clrHighlightHotTrack);
+			penText.CreatePen(PS_SOLID, 1, m_bUseTabColors ? lpNMCustomDraw->clrBtnText : lpNMCustomDraw->clrHighlightHotTrack);
 		else
 			penText.CreatePen(PS_SOLID, 1, lpNMCustomDraw->clrTextInactive);
 
@@ -543,6 +573,8 @@ public:
 		int nSelected = nItem - m_iCurSel;
 
 		TItem* pItem = this->GetItem(nItem);
+		if(!pItem) return;
+		shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
 
 		HFONT hOldFont = NULL;
 		if(bSelected)
@@ -561,15 +593,15 @@ public:
 		}
 		else if(bHot)
 		{
-			crPrevious = dc.SetTextColor(lpNMCustomDraw->clrHighlightHotTrack);
+			crPrevious = dc.SetTextColor(m_bUseTabColors ? consoleView->GetConsoleColor(7) : lpNMCustomDraw->clrHighlightHotTrack);
 		}
 		else if(bSelected)
 		{
-			crPrevious = dc.SetTextColor(lpNMCustomDraw->clrTextSelected);
+			crPrevious = dc.SetTextColor(m_bUseTabColors ? FadeColor(consoleView->GetConsoleColor(7), CSFT_FADE_ACTIVE) : lpNMCustomDraw->clrTextSelected);
 		}
 		else
 		{
-			crPrevious = dc.SetTextColor(lpNMCustomDraw->clrTextInactive);
+			crPrevious = dc.SetTextColor(m_bUseTabColors ? FadeColor(consoleView->GetConsoleColor(7), CSFT_FADE_INACTIVE) : lpNMCustomDraw->clrTextInactive);
 		}
 
 
@@ -812,11 +844,11 @@ public:
 		lpNMCustomDraw->hFontInactive = m_font;
 		lpNMCustomDraw->hFontSelected = m_fontSel;
 		lpNMCustomDraw->hBrushBackground = m_hbrBackground;
-		lpNMCustomDraw->clrTextSelected = ::GetSysColor(COLOR_BTNTEXT);
-		lpNMCustomDraw->clrTextInactive = m_clrTextInactiveTab;
+		lpNMCustomDraw->clrTextSelected = m_bUseTabColors ? FadeColor(::GetSysColor(COLOR_BTNTEXT), CSFT_FADE_ACTIVE) : ::GetSysColor(COLOR_BTNTEXT);
+		lpNMCustomDraw->clrTextInactive = m_bUseTabColors ? FadeColor(::GetSysColor(COLOR_BTNTEXT), CSFT_FADE_INACTIVE) : m_clrTextInactiveTab;
 		lpNMCustomDraw->clrSelectedTab = m_clrSelectedTab;
 		lpNMCustomDraw->clrBtnFace = ::GetSysColor(COLOR_BTNFACE);
-		lpNMCustomDraw->clrBtnShadow = ::GetSysColor(COLOR_BTNSHADOW);
+		lpNMCustomDraw->clrBtnShadow = FadeColor(m_clrSelectedTab, CSFT_FADE_INACTIVE);
 		lpNMCustomDraw->clrBtnHighlight = ::GetSysColor(COLOR_BTNHIGHLIGHT);
 		lpNMCustomDraw->clrBtnText = ::GetSysColor(COLOR_BTNTEXT);
 		lpNMCustomDraw->clrHighlight = ::GetSysColor(COLOR_HIGHLIGHT);
@@ -892,6 +924,11 @@ public:
 		{
 			pT->DrawScrollButtons(lpNMCustomDraw);
 		}
+	}
+
+	COLORREF FadeColor(COLORREF clrColor, int nFadeAmount)
+	{
+		return RGB(((int)GetRValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetGValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetBValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8);
 	}
 
 // Overrides from CCustomTabCtrl
