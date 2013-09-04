@@ -65,6 +65,7 @@ class ConsoleView
 			MESSAGE_HANDLER(WM_TIMER, OnTimer)
 			MESSAGE_HANDLER(WM_INPUTLANGCHANGEREQUEST, OnInputLangChangeRequest)
 			MESSAGE_HANDLER(WM_INPUTLANGCHANGE, OnInputLangChange)
+			MESSAGE_HANDLER(WM_IME_COMPOSITION, OnIMEComposition)
 			MESSAGE_HANDLER(WM_IME_STARTCOMPOSITION, OnIMEStartComposition)
 			MESSAGE_HANDLER(WM_IME_ENDCOMPOSITION, OnIMEEndComposition)
 			MESSAGE_HANDLER(WM_DROPFILES, OnDropFiles)
@@ -93,6 +94,7 @@ class ConsoleView
 		LRESULT OnTimer(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 		LRESULT OnInputLangChangeRequest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 		LRESULT OnInputLangChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+		LRESULT OnIMEComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 		LRESULT OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 		LRESULT OnIMEEndComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 		LRESULT OnDropFiles(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -168,7 +170,8 @@ class ConsoleView
 		void ForwardMouseClick(UINT uMsg, WPARAM wParam, const CPoint& point);
 
 		COORD GetConsoleCoord(const CPoint& clientPoint);
-
+		
+		void updateCompositWindow();
 
 	private:
 

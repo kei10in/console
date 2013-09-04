@@ -764,7 +764,13 @@ LRESULT ConsoleView::OnInputLangChangeRequest(UINT uMsg, WPARAM wParam, LPARAM l
 	return 0;
 }
 
-LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+void ConsoleView::updateCompositWindow() {
+
 	StylesSettings& stylesSettings = g_settingsHandler->GetAppearanceSettings().stylesSettings;
 	SharedMemory<ConsoleInfo>& consoleInfo = m_consoleHandler.GetConsoleInfo();
 
@@ -789,11 +795,34 @@ LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lPar
 	LOGFONT lf;
 	m_fontText.GetLogFont(lf);
 	ImmSetCompositionFont(hImc, &lf);
+}
 
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+LRESULT ConsoleView::OnIMEComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
+	updateCompositWindow();
+	return DefWindowProc(uMsg, wParam, lParam);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
+	updateCompositWindow();
 	m_imeComposition = true;
 
 	return DefWindowProc(uMsg, wParam, lParam);
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
 
 LRESULT ConsoleView::OnIMEEndComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
 	m_imeComposition = false;
