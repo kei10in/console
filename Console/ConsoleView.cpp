@@ -97,6 +97,8 @@ BOOL ConsoleView::PreTranslateMessage(MSG* pMsg)
 		// handling 'dead' characters input and passing all keys to console.
 		if (pMsg->wParam == VK_PACKET) return FALSE;
 
+		if (pMsg->wParam == VK_PROCESSKEY) return FALSE;
+
 		// We need WM_CHAR to open IME composition window for characters.
 		HIMC hImc = ImmGetContext(pMsg->hwnd);
 		BOOL isOpen = ImmGetOpenStatus(hImc);
@@ -369,7 +371,7 @@ LRESULT ConsoleView::OnSysKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 
 LRESULT ConsoleView::OnConsoleFwdMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
-	if (wParam == VK_KANJI) {
+	if ((wParam == VK_KANJI) || (wParam == VK_PROCESSKEY)) {
 		return DefWindowProc(uMsg, wParam, lParam);
 	}
 	if (((uMsg == WM_KEYDOWN) || (uMsg == WM_KEYUP)) && (wParam == VK_PACKET)) return 0;
