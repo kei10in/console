@@ -99,7 +99,6 @@ BOOL ConsoleView::PreTranslateMessage(MSG* pMsg)
 
 		HIMC hImc = ImmGetContext(pMsg->hwnd);
 		BOOL isOpen = ImmGetOpenStatus(hImc);
-		TRACE(L"isOpen: %d\n", isOpen);
 		if (isOpen) {
 			return FALSE;
 		}
