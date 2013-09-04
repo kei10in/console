@@ -750,7 +750,33 @@ LRESULT ConsoleView::OnInputLangChangeRequest(UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	StylesSettings& stylesSettings = g_settingsHandler->GetAppearanceSettings().stylesSettings;
+	SharedMemory<ConsoleInfo>& consoleInfo = m_consoleHandler.GetConsoleInfo();
+
+	TEXTMETRIC	textMetric;
+
+	m_dcText.SelectFont(m_fontText);
+	m_dcText.GetTextMetrics(&textMetric);
+
+	CRect rc		= m_cursor->GetCursorRect();
+	rc.left	+= (consoleInfo->csbi.dwCursorPosition.X - consoleInfo->csbi.srWindow.Left) * m_nCharWidth + stylesSettings.dwInsideBorder;
+	rc.top	+= (consoleInfo->csbi.dwCursorPosition.Y - consoleInfo->csbi.srWindow.Top) * m_nCharHeight + stylesSettings.dwInsideBorder
+				+ textMetric.tmExternalLeading;
+
+	COMPOSITIONFORM cf;
+	cf.dwStyle = CFS_POINT;
+	cf.ptCurrentPos.x = rc.left;
+	cf.ptCurrentPos.y = rc.top;
+
+	HIMC hImc = ImmGetContext(m_hWnd);
+	ImmSetCompositionWindow(hImc, &cf);
+
+	LOGFONT lf;
+	m_fontText.GetLogFont(lf);
+	ImmSetCompositionFont(hImc, &lf);
+
 	m_imeComposition = true;
+
 	return DefWindowProc(uMsg, wParam, lParam);
 }
 
