@@ -97,10 +97,28 @@ BOOL ConsoleView::PreTranslateMessage(MSG* pMsg)
 		// handling 'dead' characters input and passing all keys to console.
 		if (pMsg->wParam == VK_PACKET) return FALSE;
 
+		// We need WM_CHAR to open IME composition window for characters.
 		HIMC hImc = ImmGetContext(pMsg->hwnd);
 		BOOL isOpen = ImmGetOpenStatus(hImc);
 		if (isOpen) {
-			return FALSE;
+			if (!m_imeComposition) {
+				// following keys are passed to console if composition is not started.
+				if ((GetKeyState(VK_MENU) >= 0) &&
+					(GetKeyState(VK_CONTROL) >= 0))
+				{
+					if ((pMsg->wParam != VK_RETURN) && 
+						(pMsg->wParam != VK_SPACE) &&
+						(pMsg->wParam != VK_TAB) &&
+						(pMsg->wParam != VK_BACK)) 
+					{
+						return FALSE;
+					}
+				}
+			}
+			else 
+			{
+				return FALSE;
+			}
 		}
 
 		::DispatchMessage(pMsg);
@@ -351,9 +369,6 @@ LRESULT ConsoleView::OnSysKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 
 LRESULT ConsoleView::OnConsoleFwdMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
-	if (m_imeComposition) {
-		return DefWindowProc(uMsg, wParam, lParam);
-	}
 	if (wParam == VK_KANJI) {
 		return DefWindowProc(uMsg, wParam, lParam);
 	}
@@ -749,7 +764,7 @@ LRESULT ConsoleView::OnInputLangChangeRequest(UINT uMsg, WPARAM wParam, LPARAM l
 	return 0;
 }
 
-LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
 	StylesSettings& stylesSettings = g_settingsHandler->GetAppearanceSettings().stylesSettings;
 	SharedMemory<ConsoleInfo>& consoleInfo = m_consoleHandler.GetConsoleInfo();
 
@@ -780,7 +795,7 @@ LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lPar
 	return DefWindowProc(uMsg, wParam, lParam);
 }
 
-LRESULT ConsoleView::OnIMEEndComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+LRESULT ConsoleView::OnIMEEndComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
 	m_imeComposition = false;
 	return DefWindowProc(uMsg, wParam, lParam);
 }
