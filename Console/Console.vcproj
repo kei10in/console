@@ -261,7 +261,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\FreeImage\FreeImagePlus.lib delayimp.lib htmlhelp.lib userenv.lib"
+				AdditionalDependencies="..\FreeImage\FreeImagePlus.lib delayimp.lib htmlhelp.lib userenv.lib imm32.lib"
 				LinkIncremental="1"
 				DelayLoadDLLs="uxtheme.dll"
 				SubSystem="2"
