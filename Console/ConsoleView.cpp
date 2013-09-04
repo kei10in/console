@@ -64,6 +64,7 @@ ConsoleView::ConsoleView(MainFrame& mainFrame, DWORD dwTabIndex, const wstring& 
 , m_bufferMutex(NULL, FALSE, NULL)
 , m_bFlashTimerRunning(false)
 , m_dwFlashes(0)
+, m_imeComposition(false)
 {
 }
 
@@ -95,6 +96,14 @@ BOOL ConsoleView::PreTranslateMessage(MSG* pMsg)
 		// This prevents WM_CHAR and WM_SYSCHAR messages, enabling stuff like
 		// handling 'dead' characters input and passing all keys to console.
 		if (pMsg->wParam == VK_PACKET) return FALSE;
+
+		HIMC hImc = ImmGetContext(pMsg->hwnd);
+		BOOL isOpen = ImmGetOpenStatus(hImc);
+		TRACE(L"isOpen: %d\n", isOpen);
+		if (isOpen) {
+			return FALSE;
+		}
+
 		::DispatchMessage(pMsg);
 		return TRUE;
 	}
@@ -343,6 +352,12 @@ LRESULT ConsoleView::OnSysKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 
 LRESULT ConsoleView::OnConsoleFwdMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
+	if (m_imeComposition) {
+		return DefWindowProc(uMsg, wParam, lParam);
+	}
+	if (wParam == VK_KANJI) {
+		return DefWindowProc(uMsg, wParam, lParam);
+	}
 	if (((uMsg == WM_KEYDOWN) || (uMsg == WM_KEYUP)) && (wParam == VK_PACKET)) return 0;
 
 	if (!TranslateKeyDown(uMsg, wParam, lParam))
@@ -733,6 +748,16 @@ LRESULT ConsoleView::OnInputLangChangeRequest(UINT uMsg, WPARAM wParam, LPARAM l
 	::PostMessage(m_consoleHandler.GetConsoleParams()->hwndConsoleWindow, uMsg, wParam, lParam);
 	bHandled = FALSE;
 	return 0;
+}
+
+LRESULT ConsoleView::OnIMEStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	m_imeComposition = true;
+	return DefWindowProc(uMsg, wParam, lParam);
+}
+
+LRESULT ConsoleView::OnIMEEndComposition(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	m_imeComposition = false;
+	return DefWindowProc(uMsg, wParam, lParam);
 }
 
 //////////////////////////////////////////////////////////////////////////////
