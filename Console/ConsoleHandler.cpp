@@ -85,7 +85,7 @@ bool ConsoleHandler::StartShellProcess
 	const std::wstring& strConsoleTitle, 
 	DWORD dwStartupRows, 
 	DWORD dwStartupColumns, 
-	bool bDebugFlag
+	bool /*bDebugFlag*/
 )
 {
 	std::wstring strUsername(strUser);
