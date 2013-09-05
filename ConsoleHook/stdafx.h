@@ -5,7 +5,11 @@
 
 #pragma once
 
-#define _WIN32_WINNT 0x0501
+#include <WinSDKVer.h>
+// Change these values to use different versions
+#define _WIN32_WINNT 0x0601
+#include <SDKDDKVer.h>
+
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
 //////////////////////////////////////////////////////////////////////////////
