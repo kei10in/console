@@ -23,8 +23,8 @@
 
 CAppModule					_Module;
 
-shared_ptr<SettingsHandler>	g_settingsHandler;
-shared_ptr<ImageHandler>	g_imageHandler;
+boost::shared_ptr<SettingsHandler>	g_settingsHandler;
+boost::shared_ptr<ImageHandler>	g_imageHandler;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -63,58 +63,58 @@ class NoTaskbarParent
 void ParseCommandLine
 (
 	LPTSTR lptstrCmdLine, 
-	wstring& strConfigFile, 
-	wstring& strWindowTitle, 
-	vector<wstring>& startupTabs, 
-	vector<wstring>& startupDirs, 
-	vector<wstring>& startupCmds, 
+	std::wstring& strConfigFile, 
+	std::wstring& strWindowTitle, 
+	std::vector<std::wstring>& startupTabs, 
+	std::vector<std::wstring>& startupDirs, 
+	std::vector<std::wstring>& startupCmds, 
 	int& nMultiStartSleep, 
-	wstring& strDbgCmdLine
+	std::wstring& /*strDbgCmdLine*/
 )
 {
 	int						argc = 0;
-	shared_array<LPWSTR>	argv(::CommandLineToArgvW(lptstrCmdLine, &argc), ::GlobalFree);
+	boost::shared_array<LPWSTR>	argv(::CommandLineToArgvW(lptstrCmdLine, &argc), ::GlobalFree);
 
 	if (argc < 1) return;
 
 	for (int i = 0; i < argc; ++i)
 	{
-		if (wstring(argv[i]) == wstring(L"-c"))
+		if (std::wstring(argv[i]) == std::wstring(L"-c"))
 		{
 			// custom config file
 			++i;
 			if (i == argc) break;
 			strConfigFile = argv[i];
 		}
-		else if (wstring(argv[i]) == wstring(L"-w"))
+		else if (std::wstring(argv[i]) == std::wstring(L"-w"))
 		{
 			// startup tab name
 			++i;
 			if (i == argc) break;
 			strWindowTitle = argv[i];
 		}
-		else if (wstring(argv[i]) == wstring(L"-t"))
+		else if (std::wstring(argv[i]) == std::wstring(L"-t"))
 		{
 			// startup tab name
 			++i;
 			if (i == argc) break;
 			startupTabs.push_back(argv[i]);
 		}
-		else if (wstring(argv[i]) == wstring(L"-d"))
+		else if (std::wstring(argv[i]) == std::wstring(L"-d"))
 		{
 			// startup dir
 			++i;
 			if (i == argc) break;
 			startupDirs.push_back(argv[i]);
 		}
-		else if (wstring(argv[i]) == wstring(L"-r"))
+		else if (std::wstring(argv[i]) == std::wstring(L"-r"))
 		{
 			// startup cmd
 			++i;
 			if (i == argc) break;
 			startupCmds.push_back(argv[i]);
 		}
-		else if (wstring(argv[i]) == wstring(L"-ts"))
+		else if (std::wstring(argv[i]) == std::wstring(L"-ts"))
 		{
 			// startup tab sleep for multiple tabs
 			++i;
@@ -124,7 +124,7 @@ void ParseCommandLine
 		}
 		// TODO: not working yet, need to investigate
 /*
-		else if (wstring(argv[i]) == wstring(L"-dbg"))
+		else if (std::wstring(argv[i]) == std::wstring(L"-dbg"))
 		{
 			// console window replacement option (see Tip 1 in the help file)
 			++i;
@@ -149,13 +149,13 @@ int Run(LPTSTR lpstrCmdLine = NULL, int nCmdShow = SW_SHOWDEFAULT)
 	CMessageLoop theLoop;
 	_Module.AddMessageLoop(&theLoop);
 
-	wstring			strConfigFile(L"");
-	wstring			strWindowTitle(L"");
-	vector<wstring>	startupTabs;
-	vector<wstring>	startupDirs;
-	vector<wstring>	startupCmds;
+	std::wstring			strConfigFile(L"");
+	std::wstring			strWindowTitle(L"");
+	std::vector<std::wstring>	startupTabs;
+	std::vector<std::wstring>	startupDirs;
+	std::vector<std::wstring>	startupCmds;
 	int				nMultiStartSleep = 0;
-	wstring			strDbgCmdLine(L"");
+	std::wstring			strDbgCmdLine(L"");
 
 	ParseCommandLine(
 		lpstrCmdLine, 
@@ -169,9 +169,9 @@ int Run(LPTSTR lpstrCmdLine = NULL, int nCmdShow = SW_SHOWDEFAULT)
 
 	if (strConfigFile.length() == 0)
 	{
-		strConfigFile = wstring(L"console.xml");
-//		strConfigFile = Helpers::GetModulePath(NULL) + wstring(L"console.xml");
-//		strConfigFile = wstring(::_wgetenv(L"APPDATA")) + wstring(L"\\Console\\console.xml");
+		strConfigFile = std::wstring(L"console.xml");
+//		strConfigFile = Helpers::GetModulePath(NULL) + std::wstring(L"console.xml");
+//		strConfigFile = std::wstring(::_wgetenv(L"APPDATA")) + std::wstring(L"\\Console\\console.xml");
 	}
 
 	if (!g_settingsHandler->LoadSettings(Helpers::ExpandEnvironmentStrings(strConfigFile)))

@@ -5,7 +5,11 @@
 
 #pragma once
 
-#define _WIN32_WINNT 0x0501
+#include <WinSDKVer.h>
+// Change these values to use different versions
+#define _WIN32_WINNT 0x0601
+#include <SDKDDKVer.h>
+
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
 //////////////////////////////////////////////////////////////////////////////
@@ -22,7 +26,6 @@
 #include <dbghelp.h>
 
 #include <string>
-using namespace std;
 
 #pragma warning(push)
 #pragma warning(disable: 4244 4267 4511 4512 4702)
@@ -31,7 +34,6 @@ using namespace std;
 #include <boost/bind.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/algorithm/string/trim.hpp>
-using namespace boost;
 #pragma warning(pop)
 
 #include "../shared/SharedMemory.h"

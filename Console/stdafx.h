@@ -5,11 +5,11 @@
 
 #pragma once
 
+#include <WinSDKVer.h>
 // Change these values to use different versions
-#define WINVER			0x0501
-#define _WIN32_WINNT	0x0501 
-#define _WIN32_IE		0x0400
-#define _RICHEDIT_VER	0x0100
+#define _WIN32_WINNT 0x0601
+#include <SDKDDKVer.h>
+
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +75,6 @@ extern CAppModule _Module;
 #include <string>
 #include <map>
 #include <vector>
-using namespace std;
 #pragma warning(pop)
 
 #pragma warning(push)
@@ -85,7 +84,6 @@ using namespace std;
 #include <boost/format.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
-using namespace boost;
 #pragma warning(pop)
 
 #pragma warning(push)

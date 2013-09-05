@@ -29,7 +29,7 @@ class ConsoleView
 		DECLARE_WND_CLASS_EX(L"Console_2_View", CS_HREDRAW | CS_VREDRAW | CS_OWNDC | CS_DBLCLKS, COLOR_WINDOW)
 //		DECLARE_WND_CLASS_EX(L"Console_2_View", CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, COLOR_WINDOW)
 
-		ConsoleView(MainFrame& mainFrame, DWORD dwTabIndex, const wstring& strCmdLineInitialDir, const wstring& strInitialCmd, const wstring& strDbgCmdLine, DWORD dwRows, DWORD dwColumns);
+		ConsoleView(MainFrame& mainFrame, DWORD dwTabIndex, const std::wstring& strCmdLineInitialDir, const std::wstring& strInitialCmd, const std::wstring& strDbgCmdLine, DWORD dwRows, DWORD dwColumns);
 		~ConsoleView();
 
 		BOOL PreTranslateMessage(MSG* pMsg);
@@ -106,7 +106,7 @@ class ConsoleView
 		void AdjustRectAndResize(CRect& clientRect, DWORD dwResizeWindowEdge, bool bGetClientRect);
 
 		ConsoleHandler& GetConsoleHandler() { return m_consoleHandler; }
-		shared_ptr<TabData> GetTabData() { return m_tabData; }
+		boost::shared_ptr<TabData> GetTabData() { return m_tabData; }
 
 		bool GetConsoleWindowVisible() const { return m_bConsoleWindowVisible; }
 		void SetConsoleWindowVisible(bool bVisible);
@@ -147,7 +147,7 @@ class ConsoleView
 
 		void CreateOffscreenBuffers();
 		void CreateOffscreenBitmap(CDC& cdc, const CRect& rect, CBitmap& bitmap);
-		bool CreateFont(const wstring& strFontName);
+		bool CreateFont(const std::wstring& strFontName);
 
 		void DoScroll(int nType, int nScrollCode, int nThumbPos);
 
@@ -174,9 +174,9 @@ class ConsoleView
 
 		MainFrame& m_mainFrame;
 
-		wstring m_strCmdLineInitialDir;
-		wstring m_strInitialCmd;
-		wstring	m_strDbgCmdLine;
+		std::wstring m_strCmdLineInitialDir;
+		std::wstring m_strInitialCmd;
+		std::wstring	m_strDbgCmdLine;
 
 		bool	m_bInitializing;
 		bool	m_bResizing;
@@ -205,19 +205,19 @@ class ConsoleView
 
 		ConsoleHandler					m_consoleHandler;
 
-		shared_array<CharInfo>			m_screenBuffer;
+		boost::shared_array<CharInfo>	m_screenBuffer;
 
 		ConsoleSettings&				m_consoleSettings;
 		AppearanceSettings&				m_appearanceSettings;
 		HotKeys&						m_hotkeys;
 
-		shared_ptr<TabData>				m_tabData;
-		shared_ptr<BackgroundImage>		m_background;
+		boost::shared_ptr<TabData>				m_tabData;
+		boost::shared_ptr<BackgroundImage>		m_background;
 
 		CBrush							m_backgroundBrush;
 
-		shared_ptr<Cursor>				m_cursor;
-		shared_ptr<SelectionHandler>	m_selectionHandler;
+		boost::shared_ptr<Cursor>			m_cursor;
+		boost::shared_ptr<SelectionHandler>	m_selectionHandler;
 
 		MouseSettings::Command			m_mouseCommand;
 

@@ -281,7 +281,7 @@ LRESULT AnimationWindow::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT AnimationWindow::OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
+LRESULT AnimationWindow::OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	TRACE(L"AnimationWindow OnClose\n");
 
@@ -306,7 +306,7 @@ LRESULT AnimationWindow::OnEraseBkgnd(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /
 
 //////////////////////////////////////////////////////////////////////////////
 
-LRESULT AnimationWindow::OnNcPaint(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+LRESULT AnimationWindow::OnNcPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 /*
 	HDC hdcNc;
@@ -414,7 +414,7 @@ LRESULT AnimationWindow::OnTimer(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/
 
 //////////////////////////////////////////////////////////////////////////////
 
-void AnimationWindow::UpdateThumbnail(const CRect& rectOrigWnd)
+void AnimationWindow::UpdateThumbnail(const CRect& /*rectOrigWnd*/)
 {
 /*
 	m_dcThumbnail.SetStretchBltMode(HALFTONE);

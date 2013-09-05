@@ -3,14 +3,14 @@
 class ConsoleException
 {
 	public:
-		ConsoleException(const wstring& message)
+		ConsoleException(const std::wstring& message)
 		: m_message(message)
 		{
 		}
 
-		const wstring& GetMessage() const { return m_message; }
+		const std::wstring& GetMessage() const { return m_message; }
 
 	private:
 
-		wstring m_message;
+		std::wstring m_message;
 };

@@ -23,8 +23,8 @@
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-shared_ptr<Mutex>	ConsoleHandler::s_parentProcessWatchdog;
-shared_ptr<void>	ConsoleHandler::s_environmentBlock;
+boost::shared_ptr<Mutex>	ConsoleHandler::s_parentProcessWatchdog;
+boost::shared_ptr<void>	ConsoleHandler::s_environmentBlock;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,7 @@ ConsoleHandler::ConsoleHandler()
 , m_newConsoleSize()
 , m_newScrollPos()
 , m_hMonitorThread()
-, m_hMonitorThreadExit(shared_ptr<void>(::CreateEvent(NULL, FALSE, FALSE, NULL), ::CloseHandle))
+, m_hMonitorThreadExit(boost::shared_ptr<void>(::CreateEvent(NULL, FALSE, FALSE, NULL), ::CloseHandle))
 {
 }
 
@@ -77,28 +77,28 @@ void ConsoleHandler::SetupDelegates(ConsoleChangeDelegate consoleChangeDelegate,
 
 bool ConsoleHandler::StartShellProcess
 (
-	const wstring& strCustomShell, 
-	const wstring& strInitialDir, 
-	const wstring& strUser,
-	const wstring& strPassword,
-	const wstring& strInitialCmd, 
-	const wstring& strConsoleTitle, 
+	const std::wstring& strCustomShell, 
+	const std::wstring& strInitialDir, 
+	const std::wstring& strUser,
+	const std::wstring& strPassword,
+	const std::wstring& strInitialCmd, 
+	const std::wstring& strConsoleTitle, 
 	DWORD dwStartupRows, 
 	DWORD dwStartupColumns, 
-	bool bDebugFlag
+	bool /*bDebugFlag*/
 )
 {
-	wstring strUsername(strUser);
-	wstring strDomain;
+	std::wstring strUsername(strUser);
+	std::wstring strDomain;
 
-//	shared_ptr<void> userProfileKey;
-//	shared_ptr<void> userEnvironment;
-//	shared_ptr<void> userToken;
+//	boost::shared_ptr<void> userProfileKey;
+//	boost::shared_ptr<void> userEnvironment;
+//	boost::shared_ptr<void> userToken;
 
 	if (strUsername.length() > 0)
 	{
 		size_t pos = strUsername.find(L'\\');
-		if (pos != wstring::npos)
+		if (pos != std::wstring::npos)
 		{
 			strDomain	= strUsername.substr(0, pos);
 			strUsername	= strUsername.substr(pos+1);
@@ -144,7 +144,7 @@ bool ConsoleHandler::StartShellProcess
 */
 	}
 
-	wstring	strShellCmdLine(strCustomShell);
+	std::wstring	strShellCmdLine(strCustomShell);
 	
 	if (strShellCmdLine.length() == 0)
 	{
@@ -183,16 +183,16 @@ bool ConsoleHandler::StartShellProcess
 		strShellCmdLine += strInitialCmd;
 	}
 
-	wstring	strStartupTitle(strConsoleTitle);
+	std::wstring	strStartupTitle(strConsoleTitle);
 
 	if (strStartupTitle.length() == 0)
 	{
 		strStartupTitle = L"Console2 command window";
-//		strStartupTitle = str(wformat(L"Console2 command window 0x%08X") % this);
+//		strStartupTitle = str(boost::wformat(L"Console2 command window 0x%08X") % this);
 	}
 
-//	wstring strStartupDir((strUsername.length() > 0) ? Helpers::ExpandEnvironmentStringsForUser(userToken, strInitialDir) : Helpers::ExpandEnvironmentStrings(strInitialDir));
-	wstring strStartupDir((strUsername.length() > 0) ? strInitialDir : Helpers::ExpandEnvironmentStrings(strInitialDir));
+//	std::wstring strStartupDir((strUsername.length() > 0) ? Helpers::ExpandEnvironmentStringsForUser(userToken, strInitialDir) : Helpers::ExpandEnvironmentStrings(strInitialDir));
+	std::wstring strStartupDir((strUsername.length() > 0) ? strInitialDir : Helpers::ExpandEnvironmentStrings(strInitialDir));
 
 	if (strStartupDir.length() > 0)
 	{
@@ -273,7 +273,7 @@ bool ConsoleHandler::StartShellProcess
 			&si,
 			&pi))
 		{
-			throw ConsoleException(str(wformat(Helpers::LoadStringW(IDS_ERR_CANT_START_SHELL_AS_USER)) % strShellCmdLine % strUser));
+			throw ConsoleException(boost::str(boost::wformat(Helpers::LoadStringW(IDS_ERR_CANT_START_SHELL_AS_USER)) % strShellCmdLine % strUser));
 		}
 	}
 	else
@@ -290,7 +290,7 @@ bool ConsoleHandler::StartShellProcess
 				&si,
 				&pi))
 		{
-			throw ConsoleException(str(wformat(Helpers::LoadString(IDS_ERR_CANT_START_SHELL)) % strShellCmdLine));
+			throw ConsoleException(boost::str(boost::wformat(Helpers::LoadString(IDS_ERR_CANT_START_SHELL)) % strShellCmdLine));
 		}
 	}
 
@@ -308,7 +308,7 @@ bool ConsoleHandler::StartShellProcess
 	m_consoleParams->dwBufferRows			= g_settingsHandler->GetConsoleSettings().dwBufferRows;
 	m_consoleParams->dwBufferColumns		= g_settingsHandler->GetConsoleSettings().dwBufferColumns;
 
-	m_hConsoleProcess = shared_ptr<void>(pi.hProcess, ::CloseHandle);
+	m_hConsoleProcess = boost::shared_ptr<void>(pi.hProcess, ::CloseHandle);
 
 	// inject our hook DLL into console process
 	if (!InjectHookDLL(pi)) return false;
@@ -333,7 +333,7 @@ bool ConsoleHandler::StartShellProcess
 DWORD ConsoleHandler::StartMonitorThread()
 {
 	DWORD dwThreadId = 0;
-	m_hMonitorThread = shared_ptr<void>(
+	m_hMonitorThread = boost::shared_ptr<void>(
 		::CreateThread(
 		NULL,
 		0, 
@@ -432,7 +432,7 @@ void ConsoleHandler::UpdateEnvironmentBlock()
 
 //////////////////////////////////////////////////////////////////////////////
 
-bool ConsoleHandler::CreateSharedObjects(DWORD dwConsoleProcessId, const wstring& strUser)
+bool ConsoleHandler::CreateSharedObjects(DWORD dwConsoleProcessId, const std::wstring& strUser)
 {
 	// create startup params shared memory
 	m_consoleParams.Create((SharedMemNames::formatConsoleParams % dwConsoleProcessId).str(), 1, syncObjBoth, strUser);
@@ -483,7 +483,7 @@ void ConsoleHandler::CreateWatchdog()
 {
 	if (!s_parentProcessWatchdog)
 	{
-		shared_ptr<void>	sd;	// PSECURITY_DESCRIPTOR
+		boost::shared_ptr<void>	sd;	// PSECURITY_DESCRIPTOR
 
 		sd.reset(::LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH), ::LocalFree);
 		if (::InitializeSecurityDescriptor(sd.get(), SECURITY_DESCRIPTOR_REVISION))
@@ -515,7 +515,7 @@ bool ConsoleHandler::InjectHookDLL(PROCESS_INFORMATION& pi)
 {
 
 	// allocate memory for parameter in the remote process
-	wstring				strHookDllPath(GetModulePath(NULL));
+	std::wstring				strHookDllPath(GetModulePath(NULL));
 
 	if (::GetFileAttributes(strHookDllPath.c_str()) == INVALID_FILE_ATTRIBUTES) return false;
 
@@ -542,17 +542,17 @@ bool ConsoleHandler::InjectHookDLL(PROCESS_INFORMATION& pi)
 	if (isWow64Process)
 	{
 		// starting a 32-bit process from a 64-bit console
-		strHookDllPath += wstring(L"\\ConsoleHook32.dll");
+		strHookDllPath += std::wstring(L"\\ConsoleHook32.dll");
 	}
 	else
 	{
 		// same bitness :-)
-		strHookDllPath += wstring(L"\\ConsoleHook.dll");
+		strHookDllPath += std::wstring(L"\\ConsoleHook.dll");
 	}
 
 	::ZeroMemory(&context, sizeof(CONTEXT));
 
-	shared_array<BYTE> code(new BYTE[codeSize + (MAX_PATH*sizeof(wchar_t))]);
+	boost::shared_array<BYTE> code(new BYTE[codeSize + (MAX_PATH*sizeof(wchar_t))]);
 
 	memLen = (strHookDllPath.length()+1)*sizeof(wchar_t);
 	if (memLen > MAX_PATH*sizeof(wchar_t)) return false;
@@ -570,7 +570,7 @@ bool ConsoleHandler::InjectHookDLL(PROCESS_INFORMATION& pi)
 		mem = ::VirtualAllocEx(pi.hProcess, NULL, memLen, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
 		// get 32-bit kernel32
-		wstring strConsoleWowPath(GetModulePath(NULL) + wstring(L"\\ConsoleWow.exe"));
+		std::wstring strConsoleWowPath(GetModulePath(NULL) + std::wstring(L"\\ConsoleWow.exe"));
 
 		STARTUPINFO siWow;
 		::ZeroMemory(&siWow, sizeof(STARTUPINFO));
@@ -596,8 +596,8 @@ bool ConsoleHandler::InjectHookDLL(PROCESS_INFORMATION& pi)
 			return false;
 		}
 
-		shared_ptr<void> wowProcess(piWow.hProcess, ::CloseHandle);
-		shared_ptr<void> wowThread(piWow.hThread, ::CloseHandle);
+		boost::shared_ptr<void> wowProcess(piWow.hProcess, ::CloseHandle);
+		boost::shared_ptr<void> wowThread(piWow.hThread, ::CloseHandle);
 
 		if (::WaitForSingleObject(wowProcess.get(), 5000) == WAIT_TIMEOUT)
 		{
@@ -814,14 +814,14 @@ DWORD ConsoleHandler::MonitorThread()
 
 //////////////////////////////////////////////////////////////////////////////
 
-wstring ConsoleHandler::GetModulePath(HMODULE hModule)
+std::wstring ConsoleHandler::GetModulePath(HMODULE hModule)
 {
 	wchar_t szModulePath[MAX_PATH+1];
 	::ZeroMemory(szModulePath, (MAX_PATH+1)*sizeof(wchar_t));
 
 	::GetModuleFileName(hModule, szModulePath, MAX_PATH);
 
-	wstring strPath(szModulePath);
+	std::wstring strPath(szModulePath);
 
 	return strPath.substr(0, strPath.rfind(L'\\'));
 }

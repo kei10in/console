@@ -21,7 +21,7 @@
 class ConsoleView;
 
 
-typedef map<HWND, shared_ptr<ConsoleView> >	ConsoleViewMap;
+typedef std::map<HWND, boost::shared_ptr<ConsoleView> >	ConsoleViewMap;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -38,12 +38,12 @@ class MainFrame
 
 		MainFrame
 		(
-			const wstring strWindowTitle,
-			const vector<wstring>& startupTabs, 
-			const vector<wstring>& startupDirs, 
-			const vector<wstring>& startupCmds, 
+			const std::wstring strWindowTitle,
+			const std::vector<std::wstring>& startupTabs, 
+			const std::vector<std::wstring>& startupDirs, 
+			const std::vector<std::wstring>& startupCmds, 
 			int nMultiStartSleep, 
-			const wstring& strDbgCmdLine
+			const std::wstring& strDbgCmdLine
 		);
 
 		virtual BOOL PreTranslateMessage(MSG* pMsg);
@@ -197,7 +197,7 @@ class MainFrame
 
 	public:
 
-//		shared_ptr<ConsoleView> GetActiveView();
+//		boost::shared_ptr<ConsoleView> GetActiveView();
 
 		void AdjustWindowRect(CRect& rect);
 //		void AdjustAndResizeConsoleView(CRect& rectView);
@@ -205,11 +205,11 @@ class MainFrame
 
 	private:
 
-		bool CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir = wstring(L""), const wstring& strStartupCmd = wstring(L""), const wstring& strDbgCmdLine = wstring(L""));
+		bool CreateNewConsole(DWORD dwTabIndex, const std::wstring& strStartupDir = std::wstring(L""), const std::wstring& strStartupCmd = std::wstring(L""), const std::wstring& strDbgCmdLine = std::wstring(L""));
 		void CloseTab(CTabViewTabItem* pTabItem);
 		bool CloseTab(HWND hwndConsoleView, bool bAskOnClose);
 
-		void UpdateTabTitle(const shared_ptr<ConsoleView>& consoleView, CString& strTabTitle);
+		void UpdateTabTitle(const boost::shared_ptr<ConsoleView>& consoleView, CString& strTabTitle);
 		void UpdateTabsMenu(CMenuHandle mainMenu, CMenu& tabsMenu);
 		void UpdateStatusBar();
 		void SetWindowStyles();
@@ -237,13 +237,13 @@ class MainFrame
 
 		bool					m_bOnCreateDone;
 
-		const vector<wstring>&	m_startupTabs;
-		const vector<wstring>&	m_startupDirs;
-		const vector<wstring>&	m_startupCmds;
+		const std::vector<std::wstring>&	m_startupTabs;
+		const std::vector<std::wstring>&	m_startupDirs;
+		const std::vector<std::wstring>&	m_startupCmds;
 		int						m_nMultiStartSleep;
-		wstring					m_strDbgCmdLine;
+		std::wstring					m_strDbgCmdLine;
 
-		shared_ptr<ConsoleView>	m_activeView;
+		boost::shared_ptr<ConsoleView>	m_activeView;
 
 		BOOL			m_bMenuVisible;
 		BOOL			m_bToolbarVisible;
@@ -284,7 +284,7 @@ class MainFrame
 		CDC				m_dcOffscreen;
 		CDC				m_dcText;
 
-		shared_ptr<AnimationWindow>	m_animationWindow;
+		boost::shared_ptr<AnimationWindow>	m_animationWindow;
 
 };
 

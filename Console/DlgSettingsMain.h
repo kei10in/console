@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-typedef map<HTREEITEM, shared_ptr<DlgSettingsBase> >	SettingsDlgsMap;
+typedef std::map<HTREEITEM, boost::shared_ptr<DlgSettingsBase> >	SettingsDlgsMap;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -42,11 +42,11 @@ class DlgSettingsMain
 	private:
 
 		void CreateSettingsTree();
-		HTREEITEM AddDialogToTree(const wstring& strName, const shared_ptr<DlgSettingsBase>& newDlg, CRect& rect, HTREEITEM htiParent = NULL);
+		HTREEITEM AddDialogToTree(const std::wstring& strName, const boost::shared_ptr<DlgSettingsBase>& newDlg, CRect& rect, HTREEITEM htiParent = NULL);
 
 	private:
 
-		wstring						m_strSettingsFileName;
+		std::wstring						m_strSettingsFileName;
 
 		CTreeViewCtrl				m_treeCtrl;
 		CButton						m_checkUserDataDir;
