@@ -22,7 +22,6 @@
 #include <dbghelp.h>
 
 #include <string>
-using namespace std;
 
 #pragma warning(push)
 #pragma warning(disable: 4244 4267 4511 4512 4702)
@@ -31,7 +30,6 @@ using namespace std;
 #include <boost/bind.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/algorithm/string/trim.hpp>
-using namespace boost;
 #pragma warning(pop)
 
 #include "../shared/SharedMemory.h"

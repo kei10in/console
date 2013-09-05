@@ -11,7 +11,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-HRESULT XmlHelper::OpenXmlDocument(const wstring& strFilename, CComPtr<IXMLDOMDocument>& pXmlDocument, CComPtr<IXMLDOMElement>& pRootElement)
+HRESULT XmlHelper::OpenXmlDocument(const std::wstring& strFilename, CComPtr<IXMLDOMDocument>& pXmlDocument, CComPtr<IXMLDOMElement>& pRootElement)
 {
 	HRESULT hr					= S_OK;
 	VARIANT_BOOL bLoadSuccess	= 0; // FALSE
@@ -28,7 +28,7 @@ HRESULT XmlHelper::OpenXmlDocument(const wstring& strFilename, CComPtr<IXMLDOMDo
 /*
 	if (FAILED(hr) || (!bLoadSuccess))
 	{
-		if (strDefaultFilename.length() == 0) return wstring(L"");
+		if (strDefaultFilename.length() == 0) return std::wstring(L"");
 
 		strXmlFilename = Helpers::GetModulePath(NULL) + strDefaultFilename;
 
@@ -37,14 +37,14 @@ HRESULT XmlHelper::OpenXmlDocument(const wstring& strFilename, CComPtr<IXMLDOMDo
 		::ZeroMemory(szModuleFileName, (MAX_PATH+1)*sizeof(wchar_t));
 		::GetModuleFileName(NULL, szModuleFileName, MAX_PATH);
 
-		wstring strModuleFileName(szModuleFileName);
-		wstring strDefaultOptionsFileName(strModuleFileName.substr(0, strModuleFileName.rfind(L'\\')+1));
+		std::wstring strModuleFileName(szModuleFileName);
+		std::wstring strDefaultOptionsFileName(strModuleFileName.substr(0, strModuleFileName.rfind(L'\\')+1));
 
 		strDefaultOptionsFileName += strDefaultFilename;
 * /
 
 		hr = pXmlDocument->load(CComVariant(strXmlFilename.c_str()), &bLoadSuccess);
-		if (FAILED(hr) || (!bLoadSuccess)) return wstring(L"");
+		if (FAILED(hr) || (!bLoadSuccess)) return std::wstring(L"");
 	}
 */
 
@@ -153,7 +153,7 @@ void XmlHelper::GetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CCom
 
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlHelper::GetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CComBSTR& bstrName, wstring& strValue, const wstring& strDefaultValue)
+void XmlHelper::GetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CComBSTR& bstrName, std::wstring& strValue, const std::wstring& strDefaultValue)
 {
 	CComVariant	varValue;
 
@@ -198,7 +198,7 @@ void XmlHelper::GetRGBAttribute(const CComPtr<IXMLDOMElement>& pElement, COLORRE
 
 void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CComBSTR& bstrName, DWORD dwValue)
 {
-	CComVariant	varValue(str(wformat(L"%1%") % dwValue).c_str());
+	CComVariant	varValue(boost::str(boost::wformat(L"%1%") % dwValue).c_str());
 
 	pElement->setAttribute(bstrName, varValue);
 }
@@ -210,7 +210,7 @@ void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CCom
 
 void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CComBSTR& bstrName, int nValue)
 {
-	CComVariant	varValue(str(wformat(L"%1%") % nValue).c_str());
+	CComVariant	varValue(boost::str(boost::wformat(L"%1%") % nValue).c_str());
 
 	pElement->setAttribute(bstrName, varValue);
 }
@@ -222,7 +222,7 @@ void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CCom
 
 void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CComBSTR& bstrName, BYTE byValue)
 {
-	CComVariant	varValue(str(wformat(L"%1%") % byValue).c_str());
+	CComVariant	varValue(boost::str(boost::wformat(L"%1%") % byValue).c_str());
 
 	pElement->setAttribute(bstrName, varValue);
 }
@@ -244,7 +244,7 @@ void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CCom
 
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CComBSTR& bstrName, const wstring& strValue)
+void XmlHelper::SetAttribute(const CComPtr<IXMLDOMElement>& pElement, const CComBSTR& bstrName, const std::wstring& strValue)
 {
 	CComVariant	varValue(strValue.c_str());
 

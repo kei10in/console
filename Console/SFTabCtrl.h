@@ -53,7 +53,7 @@ protected:
 
 // Member variables (in addition to CCustomTabItem ones)
 protected:
-	shared_ptr<ConsoleView>	m_consoleView;
+	boost::shared_ptr<ConsoleView>	m_consoleView;
 
 // Constructors/Destructors
 public:
@@ -84,11 +84,11 @@ public:
 // Accessors
 public:
 
-	shared_ptr<ConsoleView> GetConsoleView() const
+	boost::shared_ptr<ConsoleView> GetConsoleView() const
 	{
 		return m_consoleView;
 	}
-	bool SetConsoleView(shared_ptr<ConsoleView> consoleView = shared_ptr<ConsoleView>())
+	bool SetConsoleView(boost::shared_ptr<ConsoleView> consoleView = boost::shared_ptr<ConsoleView>())
 	{
 		m_consoleView = consoleView;
 		return true;
@@ -353,7 +353,7 @@ public:
 			CPen penText;
 			TItem* pItem = GetItem(m_iCurSel);
 			if(!pItem) return;
-			shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
+			boost::shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
 			penText.CreatePen(PS_SOLID, 1, dwStyle & CSFT_STYLE_COLOR_TABS ? FadeColor(consoleView->GetConsoleColor(0, true), CSFT_FADE_BORDER) : lpNMCustomDraw->clrBtnText);
 
 			if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
@@ -422,7 +422,7 @@ public:
 		WTL::CDCHandle dc(lpNMCustomDraw->nmcd.hdc);
 		TItem* pItem = GetItem(lpNMCustomDraw->nmcd.dwItemSpec);
 		if(!pItem) return;
-		shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
+		boost::shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
 
 		if(CTCS_BOTTOM == (dwStyle & CTCS_BOTTOM))
 			rcTab.bottom++;
@@ -502,7 +502,7 @@ public:
 		WTL::CDCHandle dc( lpNMCustomDraw->nmcd.hdc );
 		TItem* pItem = GetItem(nItem);
 		if(!pItem) return;
-		shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
+		boost::shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
 
 
 		COLORREF clrBackground;
@@ -592,7 +592,7 @@ public:
 
 		TItem* pItem = this->GetItem(nItem);
 		if(!pItem) return;
-		shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
+		boost::shared_ptr<ConsoleView> consoleView = pItem->GetConsoleView();
 
 		HFONT hOldFont = NULL;
 		if(bSelected)
@@ -949,7 +949,7 @@ public:
 		return RGB(((int)GetRValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetGValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8, ((int)GetBValue(clrColor) * (255 - nFadeAmount) + 128 * nFadeAmount) >> 8);
 	}
 
-	void PaintBackground(shared_ptr<ConsoleView> consoleView, WTL::CDCHandle& dc, RECT& rect, int nScrollOffset, int nFadeAmount = 0)
+	void PaintBackground(boost::shared_ptr<ConsoleView> consoleView, WTL::CDCHandle& dc, RECT& rect, int nScrollOffset, int nFadeAmount = 0)
 	{
 		RECT rcScreen;
 		this->GetClientRect(&rcScreen);

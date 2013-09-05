@@ -11,14 +11,14 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-wstring Helpers::GetModulePath(HINSTANCE hInstance)
+std::wstring Helpers::GetModulePath(HINSTANCE hInstance)
 {
 	wchar_t szModulePath[MAX_PATH];
 	::ZeroMemory(szModulePath, sizeof(szModulePath));
 
 	::GetModuleFileName(hInstance, szModulePath, MAX_PATH);
 
-	wstring strPath(szModulePath);
+	std::wstring strPath(szModulePath);
 
 	return strPath.substr(0, strPath.rfind(L'\\')+1);
 }
@@ -28,14 +28,14 @@ wstring Helpers::GetModulePath(HINSTANCE hInstance)
 
 //////////////////////////////////////////////////////////////////////////////
 
-wstring Helpers::GetModuleFileName(HINSTANCE hInstance)
+std::wstring Helpers::GetModuleFileName(HINSTANCE hInstance)
 {
 	wchar_t szModulePath[MAX_PATH];
 	::ZeroMemory(szModulePath, sizeof(szModulePath));
 
 	::GetModuleFileName(hInstance, szModulePath, MAX_PATH);
 
-	wstring strPath(szModulePath);
+	std::wstring strPath(szModulePath);
 
 	return strPath;
 }
@@ -45,14 +45,14 @@ wstring Helpers::GetModuleFileName(HINSTANCE hInstance)
 
 //////////////////////////////////////////////////////////////////////////////
 
-wstring Helpers::ExpandEnvironmentStrings(const wstring& str)
+std::wstring Helpers::ExpandEnvironmentStrings(const std::wstring& str)
 {
-	shared_array<wchar_t> szExpanded(new wchar_t[0x8000]);
+	boost::shared_array<wchar_t> szExpanded(new wchar_t[0x8000]);
 
 	::ZeroMemory(szExpanded.get(), 0x8000*sizeof(wchar_t));
 	::ExpandEnvironmentStrings(str.c_str(), szExpanded.get(), 0x8000);
 
-	return wstring(szExpanded.get());
+	return std::wstring(szExpanded.get());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -60,14 +60,14 @@ wstring Helpers::ExpandEnvironmentStrings(const wstring& str)
 
 //////////////////////////////////////////////////////////////////////////////
 
-wstring Helpers::ExpandEnvironmentStringsForUser(const shared_ptr<void>& userToken, const wstring& str)
+std::wstring Helpers::ExpandEnvironmentStringsForUser(const boost::shared_ptr<void>& userToken, const std::wstring& str)
 {
-	shared_array<wchar_t> szExpanded(new wchar_t[MAX_PATH]);
+	boost::shared_array<wchar_t> szExpanded(new wchar_t[MAX_PATH]);
 
 	::ZeroMemory(szExpanded.get(), MAX_PATH*sizeof(wchar_t));
 	::ExpandEnvironmentStringsForUser(userToken.get(), str.c_str(), szExpanded.get(), MAX_PATH);
 
-	return wstring(szExpanded.get());
+	return std::wstring(szExpanded.get());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -172,15 +172,15 @@ HBITMAP Helpers::CreateBitmap(HDC dc, DWORD dwWidth, DWORD dwHeight, CBitmap& bi
 
 //////////////////////////////////////////////////////////////////////////////
 
-wstring Helpers::LoadString(UINT uID)
+std::wstring Helpers::LoadString(UINT uID)
 {
 	int bufferSize = 0x800;
-	scoped_array<wchar_t>	str(new wchar_t[bufferSize]);
+	boost::scoped_array<wchar_t>	str(new wchar_t[bufferSize]);
 	::ZeroMemory(str.get(), bufferSize * sizeof(wchar_t));
 	
 	bufferSize = ::LoadString(::GetModuleHandle(NULL), uID, str.get(), bufferSize);
 	
-	return wstring(str.get());
+	return std::wstring(str.get());
 }
 
 //////////////////////////////////////////////////////////////////////////////

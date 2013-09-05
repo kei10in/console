@@ -36,8 +36,8 @@ struct ConsoleSettings : public SettingsBase
 
 	ConsoleSettings& operator=(const ConsoleSettings& other);
 
-	wstring		strShell;
-	wstring		strInitialDir;
+	std::wstring		strShell;
+	std::wstring		strInitialDir;
 
 	DWORD		dwRefreshInterval;
 	DWORD		dwChangeRefreshInterval;
@@ -83,7 +83,7 @@ struct FontSettings : public SettingsBase
 
 	FontSettings& operator=(const FontSettings& other);
 
-	wstring			strName;
+	std::wstring			strName;
 	DWORD			dwSize;
 	bool			bBold;
 	bool			bItalic;
@@ -107,8 +107,8 @@ struct WindowSettings : public SettingsBase
 
 	WindowSettings& operator=(const WindowSettings& other);
 
-	wstring			strTitle;
-	wstring			strIcon;
+	std::wstring			strTitle;
+	std::wstring			strIcon;
 	bool			bUseTabIcon;
 	bool			bUseConsoleTitle;
 	bool			bShowCommand;
@@ -409,7 +409,7 @@ struct HotKeys : public SettingsBase
 
 	struct CommandData
 	{
-		CommandData(const wstring& command, WORD commandID, const wstring& description, bool global = false)
+		CommandData(const std::wstring& command, WORD commandID, const std::wstring& description, bool global = false)
 		: strCommand(command)
 		, wCommandID(commandID)
 		, strDescription(description)
@@ -419,9 +419,9 @@ struct HotKeys : public SettingsBase
 			::ZeroMemory(&accelHotkey, sizeof(ACCEL));
 		}
 
-		wstring	strCommand;
+		std::wstring	strCommand;
 		WORD	wCommandID;
-		wstring	strDescription;
+		std::wstring	strDescription;
 		ACCEL	accelHotkey;
 		bool	bExtended;
 		bool	bGlobal;
@@ -431,11 +431,11 @@ struct HotKeys : public SettingsBase
 	struct commandID{};
 
 	typedef multi_index_container<
-				shared_ptr<CommandData>,
+				boost::shared_ptr<CommandData>,
 				indexed_by
 				<
 					sequenced<>,
-					ordered_unique<tag<command>,	member<CommandData, wstring, &CommandData::strCommand> >,
+					ordered_unique<tag<command>,	member<CommandData, std::wstring, &CommandData::strCommand> >,
 					ordered_unique<tag<commandID>,	member<CommandData, WORD, &CommandData::wCommandID> >
 				> >									Commands;
 
@@ -525,7 +525,7 @@ struct MouseSettings : public SettingsBase
 
 	struct CommandData
 	{
-		CommandData(Command cmd, wstring strCmd, wstring strDesc)
+		CommandData(Command cmd, std::wstring strCmd, std::wstring strDesc)
 		: command(cmd)
 		, strCommand(strCmd)
 		, strDescription(strDesc)
@@ -533,8 +533,8 @@ struct MouseSettings : public SettingsBase
 		}
 
 		Command	command;
-		wstring	strCommand;
-		wstring	strDescription;
+		std::wstring	strCommand;
+		std::wstring	strDescription;
 		Action	action;
 	};
 
@@ -542,11 +542,11 @@ struct MouseSettings : public SettingsBase
 	struct commandName{};
 
 	typedef multi_index_container<
-				shared_ptr<CommandData>,
+				boost::shared_ptr<CommandData>,
 				indexed_by
 				<
 					sequenced<>,
-					ordered_unique<tag<commandName>,		member<CommandData, wstring, &CommandData::strCommand> >,
+					ordered_unique<tag<commandName>,		member<CommandData, std::wstring, &CommandData::strCommand> >,
 					ordered_unique<tag<commandID>,			member<CommandData, Command, &CommandData::command> >
 				> >									Commands;
 
@@ -580,7 +580,7 @@ enum BackgroundImageType
 
 struct TabData
 {
-	TabData(const wstring& shell, const wstring& initialDir)
+	TabData(const std::wstring& shell, const std::wstring& initialDir)
 	: strTitle(L"Console")
 	, strIcon(L"")
 	, bUseDefaultIcon(false)
@@ -601,14 +601,14 @@ struct TabData
 	}
 
 	// custom shell settings
-	wstring							strTitle;
-	wstring							strIcon;
+	std::wstring							strTitle;
+	std::wstring							strIcon;
 	bool							bUseDefaultIcon;
 
-	wstring							strShell;
-	wstring							strInitialDir;
+	std::wstring							strShell;
+	std::wstring							strInitialDir;
 	bool							bRunAsUser;
-	wstring							strUser;
+	std::wstring							strUser;
 
 	DWORD							dwCursorStyle;
 	COLORREF						crCursorColor;
@@ -630,7 +630,7 @@ struct TabData
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef vector<shared_ptr<TabData> >	TabDataVector;
+typedef std::vector<boost::shared_ptr<TabData> >	TabDataVector;
 
 struct TabSettings : public SettingsBase
 {
@@ -639,14 +639,14 @@ struct TabSettings : public SettingsBase
 	bool Load(const CComPtr<IXMLDOMElement>& pSettingsRoot);
 	bool Save(const CComPtr<IXMLDOMElement>& pSettingsRoot);
 
-	void SetDefaults(const wstring& defaultShell, const wstring& defaultInitialDir);
+	void SetDefaults(const std::wstring& defaultShell, const std::wstring& defaultInitialDir);
 
 	TabDataVector	tabDataVector;
 
 private:
 
-	wstring			strDefaultShell;
-	wstring			strDefaultInitialDir;
+	std::wstring			strDefaultShell;
+	std::wstring			strDefaultInitialDir;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -676,10 +676,10 @@ class SettingsHandler
 
 	public:
 
-		bool LoadSettings(const wstring& strSettingsFileName);
+		bool LoadSettings(const std::wstring& strSettingsFileName);
 		bool SaveSettings();
 
-		wstring	GetSettingsFileName() const { return m_strSettingsPath+m_strSettingsFileName; }
+		std::wstring	GetSettingsFileName() const { return m_strSettingsPath+m_strSettingsFileName; }
 
 		SettingsDirType GetSettingsDirType() const { return m_settingsDirType; }
 		void SetUserDataDir(SettingsDirType settingsDirType);
@@ -698,8 +698,8 @@ class SettingsHandler
 
 	private:
 
-		wstring				m_strSettingsPath;
-		wstring				m_strSettingsFileName;
+		std::wstring				m_strSettingsPath;
+		std::wstring				m_strSettingsFileName;
 
 		SettingsDirType		m_settingsDirType;
 

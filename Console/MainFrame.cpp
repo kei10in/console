@@ -23,12 +23,12 @@
 
 MainFrame::MainFrame
 (
-	const wstring strWindowTitle,
-	const vector<wstring>& startupTabs, 
-	const vector<wstring>& startupDirs, 
-	const vector<wstring>& startupCmds, 
+	const std::wstring strWindowTitle,
+	const std::vector<std::wstring>& startupTabs, 
+	const std::vector<std::wstring>& startupDirs, 
+	const std::vector<std::wstring>& startupCmds, 
 	int nMultiStartSleep, 
-	const wstring& strDbgCmdLine
+	const std::wstring& strDbgCmdLine
 )
 : m_bOnCreateDone(false)
 , m_startupTabs(startupTabs)
@@ -154,8 +154,8 @@ LRESULT MainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 	// create initial console window(s)
 	if (m_startupTabs.size() == 0)
 	{
-		wstring strStartupDir(L"");
-		wstring strStartupCmd(L"");
+		std::wstring strStartupDir(L"");
+		std::wstring strStartupCmd(L"");
 
 		if (m_startupDirs.size() > 0) strStartupDir = m_startupDirs[0];
 		if (m_startupCmds.size() > 0) strStartupCmd = m_startupCmds[0];
@@ -172,7 +172,7 @@ LRESULT MainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 			// find tab with corresponding name...
 			for (size_t i = 0; i < tabSettings.tabDataVector.size(); ++i)
 			{
-				wstring str = tabSettings.tabDataVector[i]->strTitle;
+				std::wstring str = tabSettings.tabDataVector[i]->strTitle;
 				if (tabSettings.tabDataVector[i]->strTitle == m_startupTabs[tabIndex])
 				{
 					// found it, create
@@ -180,7 +180,7 @@ LRESULT MainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 							static_cast<DWORD>(i), 
 							m_startupDirs[tabIndex],
 							m_startupCmds[tabIndex],
-							(i == 0) ? m_strDbgCmdLine : wstring(L"")))
+							(i == 0) ? m_strDbgCmdLine : std::wstring(L"")))
 					{
 						bAtLeastOneStarted = true;
 					}
@@ -828,7 +828,7 @@ LRESULT MainFrame::OnSettingChange(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lPar
 {
 	if (lParam == 0) return 0;
 
-	wstring strArea(reinterpret_cast<wchar_t*>(lParam));
+	std::wstring strArea(reinterpret_cast<wchar_t*>(lParam));
 
 	// according to WM_SETTINGCHANGE doc:
 	// to change environment, lParam should be "Environment"
@@ -890,7 +890,7 @@ LRESULT MainFrame::OnUpdateTitles(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*
 
 	if (itView == m_views.end()) return 0;
 
-	shared_ptr<ConsoleView>	consoleView(itView->second);
+	boost::shared_ptr<ConsoleView>	consoleView(itView->second);
 	WindowSettings&			windowSettings	= g_settingsHandler->GetAppearanceSettings().windowSettings;
 
 	if (windowSettings.bUseConsoleTitle)
@@ -1098,7 +1098,7 @@ LRESULT MainFrame::OnTabChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& bHandled)
 		}
 		else
 		{
-			m_activeView = shared_ptr<ConsoleView>();
+			m_activeView = boost::shared_ptr<ConsoleView>();
 		}
 	}
 
@@ -1589,7 +1589,7 @@ LRESULT MainFrame::OnPopupPopupMenu(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
 
 LRESULT MainFrame::OnHelp(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
-	::HtmlHelp(m_hWnd, (Helpers::GetModulePath(NULL) + wstring(L"console.chm")).c_str(), HH_DISPLAY_TOPIC, NULL);
+	::HtmlHelp(m_hWnd, (Helpers::GetModulePath(NULL) + std::wstring(L"console.chm")).c_str(), HH_DISPLAY_TOPIC, NULL);
 	return 0;
 }
 
@@ -1604,12 +1604,12 @@ LRESULT MainFrame::OnHelp(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, 
 //////////////////////////////////////////////////////////////////////////////
 /*
 
-shared_ptr<ConsoleView> MainFrame::GetActiveView()
+boost::shared_ptr<ConsoleView> MainFrame::GetActiveView()
 {
-	if (m_views.size() == 0) return shared_ptr<ConsoleView>();
+	if (m_views.size() == 0) return boost::shared_ptr<ConsoleView>();
 
 	ConsoleViewMap::iterator	findIt		= m_views.find(m_hWndActive);
-	if (findIt == m_views.end()) return shared_ptr<ConsoleView>();
+	if (findIt == m_views.end()) return boost::shared_ptr<ConsoleView>();
 
 	return findIt->second;
 }
@@ -1716,7 +1716,7 @@ void MainFrame::AdjustAndResizeConsoleView(CRect& rectView)
 
 //////////////////////////////////////////////////////////////////////////////
 
-bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir /*= wstring(L"")*/, const wstring& strStartupCmd /*= wstring(L"")*/, const wstring& strDbgCmdLine /*= wstring(L"")*/)
+bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const std::wstring& strStartupDir /*= std::wstring(L"")*/, const std::wstring& strStartupCmd /*= std::wstring(L"")*/, const std::wstring& strDbgCmdLine /*= std::wstring(L"")*/)
 {
 	if (dwTabIndex >= g_settingsHandler->GetTabSettings().tabDataVector.size()) return false;
 
@@ -1737,9 +1737,9 @@ bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir 
 		m_dwColumns	= dwColumns;
 	}
 
-	shared_ptr<TabData> tabData = g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex];
+	boost::shared_ptr<TabData> tabData = g_settingsHandler->GetTabSettings().tabDataVector[dwTabIndex];
 
-	shared_ptr<ConsoleView> consoleView(new ConsoleView(*this, dwTabIndex, strStartupDir, strStartupCmd, strDbgCmdLine, dwRows, dwColumns));
+	boost::shared_ptr<ConsoleView> consoleView(new ConsoleView(*this, dwTabIndex, strStartupDir, strStartupCmd, strDbgCmdLine, dwRows, dwColumns));
 	UserCredentials			userCredentials;
 
 	if (tabData->bRunAsUser)
@@ -1781,7 +1781,7 @@ bool MainFrame::CreateNewConsole(DWORD dwTabIndex, const wstring& strStartupDir 
 		if (strMessage.GetLength() == 0)
 		{
 			// copied from ConsoleView::OnCreate
-			wstring strShell;
+			std::wstring strShell;
 			if (strDbgCmdLine.length() > 0)
 			{
 				strShell	= strDbgCmdLine;
@@ -1882,7 +1882,7 @@ bool MainFrame::CloseTab(HWND hwndConsoleView, bool bAskOnClose = false)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void MainFrame::UpdateTabTitle(const shared_ptr<ConsoleView>& consoleView, CString& strTabTitle)
+void MainFrame::UpdateTabTitle(const boost::shared_ptr<ConsoleView>& consoleView, CString& strTabTitle)
 {
 	// we always set the tool tip text to the complete, untrimmed title
 	UpdateTabToolTip(*consoleView, strTabTitle);
@@ -2579,12 +2579,12 @@ void MainFrame::CreateAcceleratorTable()
 	HotKeys&							hotKeys	= g_settingsHandler->GetHotKeys();
 	HotKeys::CommandsSequence::iterator it		= hotKeys.commands.begin();
 
-	shared_array<ACCEL>					accelTable(new ACCEL[hotKeys.commands.size()]);
+	boost::shared_array<ACCEL>					accelTable(new ACCEL[hotKeys.commands.size()]);
 	int									nAccelCount = 0;
 
 	for (; it != hotKeys.commands.end(); ++it)
 	{
-		shared_ptr<HotKeys::CommandData> c(*it);
+		boost::shared_ptr<HotKeys::CommandData> c(*it);
 
 		if ((*it)->accelHotkey.cmd == 0) continue;
 		if ((*it)->accelHotkey.key == 0) continue;
@@ -2668,7 +2668,7 @@ void MainFrame::CreateStatusBar()
 BOOL MainFrame::SetTrayIcon(DWORD dwMessage) {
 	
 	NOTIFYICONDATA	tnd;
-	wstring			strToolTip(m_strWindowTitle);
+	std::wstring			strToolTip(m_strWindowTitle);
 
 	tnd.cbSize				= sizeof(NOTIFYICONDATA);
 	tnd.hWnd				= m_hWnd;

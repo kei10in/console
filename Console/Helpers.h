@@ -14,11 +14,11 @@ class Helpers
 {
 	public:
 
-		static wstring GetModulePath(HINSTANCE hInstance);
-		static wstring GetModuleFileName(HINSTANCE hInstance);
+		static std::wstring GetModulePath(HINSTANCE hInstance);
+		static std::wstring GetModuleFileName(HINSTANCE hInstance);
 
-		static wstring ExpandEnvironmentStrings(const wstring& str);
-		static wstring ExpandEnvironmentStringsForUser(const shared_ptr<void>& userToken, const wstring& str);
+		static std::wstring ExpandEnvironmentStrings(const std::wstring& str);
+		static std::wstring ExpandEnvironmentStringsForUser(const boost::shared_ptr<void>& userToken, const std::wstring& str);
 
 		static void GetMonitorRect(HWND hWnd, CRect& rectMonitor);
 		static void GetDesktopRect(HWND hWnd, CRect& rectDesktop);
@@ -26,7 +26,7 @@ class Helpers
 
 		static HBITMAP CreateBitmap(HDC dc, DWORD dwWidth, DWORD dwHeight, CBitmap& bitmap);
 
-		static wstring LoadString(UINT uID);
+		static std::wstring LoadString(UINT uID);
 
 	private:
 
@@ -115,7 +115,7 @@ class Mutex
 
 	private:
 
-		shared_ptr<void>	m_mutex;
+		boost::shared_ptr<void>	m_mutex;
 };
 
 //////////////////////////////////////////////////////////////////////////////

@@ -26,7 +26,7 @@ ConsoleHandler::ConsoleHandler()
 , m_newConsoleSize()
 , m_newScrollPos()
 , m_hMonitorThread()
-, m_hMonitorThreadExit(shared_ptr<void>(::CreateEvent(NULL, FALSE, FALSE, NULL), ::CloseHandle))
+, m_hMonitorThreadExit(boost::shared_ptr<void>(::CreateEvent(NULL, FALSE, FALSE, NULL), ::CloseHandle))
 , m_dwScreenBufferSize(0)
 {
 }
@@ -49,7 +49,7 @@ ConsoleHandler::~ConsoleHandler()
 DWORD ConsoleHandler::StartMonitorThread()
 {
 	DWORD dwThreadId = 0;
-	m_hMonitorThread = shared_ptr<void>(
+	m_hMonitorThread = boost::shared_ptr<void>(
 							::CreateThread(
 								NULL,
 								0, 
@@ -128,7 +128,7 @@ void ConsoleHandler::ReadConsoleBuffer()
 	// we take a fresh STDOUT handle - seems to work better (in case a program
 	// has opened a new screen output buffer)
 	// no need to call CloseHandle when done, we're reusing console handles
-	shared_ptr<void> hStdOut(::CreateFile(
+	boost::shared_ptr<void> hStdOut(::CreateFile(
 								L"CONOUT$",
 								GENERIC_WRITE | GENERIC_READ,
 								FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -156,7 +156,7 @@ void ConsoleHandler::ReadConsoleBuffer()
 	DWORD					dwScreenBufferSize	= coordConsoleSize.X * coordConsoleSize.Y;
 	DWORD					dwScreenBufferOffset= 0;
 
-	shared_array<CHAR_INFO> pScreenBuffer(new CHAR_INFO[dwScreenBufferSize]);
+	boost::shared_array<CHAR_INFO> pScreenBuffer(new CHAR_INFO[dwScreenBufferSize]);
 
 	COORD		coordBufferSize;
 	// start coordinates for the buffer are always (0, 0) - we use offset
@@ -459,7 +459,7 @@ void ConsoleHandler::CopyConsoleText()
 
 //	TRACE(L"Copy request: %ix%i - %ix%i\n", coordStart.X, coordStart.Y, coordEnd.X, coordEnd.Y);
 
-	shared_ptr<void> hStdOut(
+	boost::shared_ptr<void> hStdOut(
 						::CreateFile(
 							L"CONOUT$",
 							GENERIC_WRITE | GENERIC_READ,
@@ -472,7 +472,7 @@ void ConsoleHandler::CopyConsoleText()
 
 	// get total console size
 	CONSOLE_SCREEN_BUFFER_INFO	csbiConsole;
-	wstring						strText(L"");
+	std::wstring						strText(L"");
 
 	::GetConsoleScreenBufferInfo(hStdOut.get(), &csbiConsole);
 
@@ -481,7 +481,7 @@ void ConsoleHandler::CopyConsoleText()
 		SMALL_RECT				srBuffer;
 		COORD					coordFrom		= {0, 0};
 		COORD					coordBufferSize	= {(m_consoleParams->dwBufferColumns > 0) ? static_cast<SHORT>(m_consoleParams->dwBufferColumns) : static_cast<SHORT>(m_consoleParams->dwColumns), 1};
-		shared_array<CHAR_INFO> pScreenBuffer(new CHAR_INFO[coordBufferSize.X]);
+		boost::shared_array<CHAR_INFO> pScreenBuffer(new CHAR_INFO[coordBufferSize.X]);
 
 //		TRACE(L"i: %i, coordStart.Y: %i, coordStart.X: %i\n", i, coordStart.Y, coordStart.X);
 		srBuffer.Left	= (i == coordStart.Y) ? coordStart.X : 0;
@@ -502,7 +502,7 @@ void ConsoleHandler::CopyConsoleText()
 
 //		TRACE(L"Read region:    (%i, %i) - (%i, %i)\n", srBuffer.Left, srBuffer.Top, srBuffer.Right, srBuffer.Bottom);
 
-		wstring strRow(L"");
+		std::wstring strRow(L"");
 		bool	bWrap = true;
 
 		for (SHORT x = 0; x <= srBuffer.Right - srBuffer.Left; ++x)
@@ -553,9 +553,9 @@ void ConsoleHandler::CopyConsoleText()
 		{
 			switch(m_consoleCopyInfo->copyNewlineChar)
 			{
-				case newlineCRLF: strRow += wstring(L"\r\n"); break;
-				case newlineLF	: strRow += wstring(L"\n"); break;
-				default			: strRow += wstring(L"\r\n"); break;
+				case newlineCRLF: strRow += std::wstring(L"\r\n"); break;
+				case newlineLF	: strRow += std::wstring(L"\n"); break;
+				default			: strRow += std::wstring(L"\r\n"); break;
 			}
 		}
 
@@ -590,7 +590,7 @@ void ConsoleHandler::CopyConsoleText()
 
 //////////////////////////////////////////////////////////////////////////////
 
-void ConsoleHandler::SendConsoleText(HANDLE hStdIn, const shared_ptr<wchar_t>& textBuffer)
+void ConsoleHandler::SendConsoleText(HANDLE hStdIn, const boost::shared_ptr<wchar_t>& textBuffer)
 {
 	wchar_t*	pszText	= textBuffer.get();
 	size_t		textLen = wcslen(pszText);
@@ -608,7 +608,7 @@ void ConsoleHandler::SendConsoleText(HANDLE hStdIn, const shared_ptr<wchar_t>& t
 			partLen = textLen - parts*partLen;
 		}
 
-		scoped_array<INPUT_RECORD> pKeyEvents(new INPUT_RECORD[partLen]);
+		boost::scoped_array<INPUT_RECORD> pKeyEvents(new INPUT_RECORD[partLen]);
 		::ZeroMemory(pKeyEvents.get(), sizeof(INPUT_RECORD)*partLen);
 
 		for (size_t i = 0; (i < partLen) && (offset < textLen); ++i, ++offset, ++keyEventCount)
@@ -655,7 +655,7 @@ void ConsoleHandler::SendConsoleText(HANDLE hStdIn, const shared_ptr<wchar_t>& t
 
 //////////////////////////////////////////////////////////////////////////////
 
-void ConsoleHandler::SetResetKeyInput(scoped_array<INPUT>& kbdInputs, WORD wVk, short& sCount)
+void ConsoleHandler::SetResetKeyInput(boost::scoped_array<INPUT>& kbdInputs, WORD wVk, short& sCount)
 {
 	if ((::GetAsyncKeyState(wVk) & 0x8000) != 0)
 	{
@@ -804,7 +804,7 @@ DWORD ConsoleHandler::MonitorThread()
 	// FIX: this seems to case problems on startup
 //	ReadConsoleBuffer();
 
-	shared_ptr<void> parentProcessWatchdog(::OpenMutex(SYNCHRONIZE, FALSE, (LPCTSTR)((SharedMemNames::formatWatchdog % m_consoleParams->dwParentProcessId).str().c_str())), ::CloseHandle);
+	boost::shared_ptr<void> parentProcessWatchdog(::OpenMutex(SYNCHRONIZE, FALSE, (LPCTSTR)((SharedMemNames::formatWatchdog % m_consoleParams->dwParentProcessId).str().c_str())), ::CloseHandle);
 	TRACE(L"Watchdog handle: 0x%08X\n", parentProcessWatchdog.get());
 
 	HANDLE	arrWaitHandles[] =
@@ -850,13 +850,13 @@ DWORD ConsoleHandler::MonitorThread()
 			{
 				SharedMemoryLock memLock(m_consoleTextInfo);
 
-				shared_ptr<wchar_t>	textBuffer;
+				boost::shared_ptr<wchar_t>	textBuffer;
 				
 				if (m_consoleTextInfo->mem != NULL)
 				{
 					textBuffer.reset(
 									reinterpret_cast<wchar_t*>(m_consoleTextInfo->mem),
-									bind<BOOL>(::VirtualFreeEx, ::GetCurrentProcess(), _1, NULL, MEM_RELEASE));
+									boost::bind<BOOL>(::VirtualFreeEx, ::GetCurrentProcess(), _1, NULL, MEM_RELEASE));
 				}
 
 				SendConsoleText(hStdIn, textBuffer);

@@ -32,8 +32,8 @@ struct UserCredentials
 		}
 	}
 
-	wstring	user;
-	wstring password;
+	std::wstring	user;
+	std::wstring password;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -52,12 +52,12 @@ class ConsoleHandler
 		void SetupDelegates(ConsoleChangeDelegate consoleChangeDelegate, ConsoleCloseDelegate consoleCloseDelegate);
 		bool StartShellProcess
 		(
-			const wstring& strCustomShell, 
-			const wstring& strInitialDir, 
-			const wstring& strUser,
-			const wstring& strPassword,
-			const wstring& strInitialCmd, 
-			const wstring& strConsoleTitle, 
+			const std::wstring& strCustomShell, 
+			const std::wstring& strInitialDir, 
+			const std::wstring& strUser,
+			const std::wstring& strPassword,
+			const std::wstring& strInitialCmd, 
+			const std::wstring& strConsoleTitle, 
 			DWORD dwStartupRows, 
 			DWORD dwStartupColumns, 
 			bool bDebugFlag
@@ -66,7 +66,7 @@ class ConsoleHandler
 		DWORD StartMonitorThread();
 		void StopMonitorThread();
 
-		shared_ptr<void> GetConsoleHandle() const					{ return m_hConsoleProcess; }
+		boost::shared_ptr<void> GetConsoleHandle() const					{ return m_hConsoleProcess; }
 
 		SharedMemory<ConsoleParams>& GetConsoleParams()				{ return m_consoleParams; }
 		SharedMemory<ConsoleInfo>& GetConsoleInfo()	{ return m_consoleInfo; }
@@ -86,7 +86,7 @@ class ConsoleHandler
 
 	private:
 
-		bool CreateSharedObjects(DWORD dwConsoleProcessId, const wstring& strUser);
+		bool CreateSharedObjects(DWORD dwConsoleProcessId, const std::wstring& strUser);
 		void CreateWatchdog();
 
 		bool InjectHookDLL(PROCESS_INFORMATION& pi);
@@ -99,7 +99,7 @@ class ConsoleHandler
 
 	private:
 		
-		wstring GetModulePath(HMODULE hModule);
+		std::wstring GetModulePath(HMODULE hModule);
 
 
 	private:
@@ -107,7 +107,7 @@ class ConsoleHandler
 		ConsoleChangeDelegate						m_consoleChangeDelegate;
 		ConsoleCloseDelegate						m_consoleCloseDelegate;
 
-		shared_ptr<void>							m_hConsoleProcess;
+		boost::shared_ptr<void>							m_hConsoleProcess;
 
 		SharedMemory<ConsoleParams>					m_consoleParams;
 		SharedMemory<ConsoleInfo>	m_consoleInfo;
@@ -120,11 +120,11 @@ class ConsoleHandler
 		SharedMemory<ConsoleSize>					m_newConsoleSize;
 		SharedMemory<SIZE>							m_newScrollPos;
 
-		shared_ptr<void>							m_hMonitorThread;
-		shared_ptr<void>							m_hMonitorThreadExit;
+		boost::shared_ptr<void>							m_hMonitorThread;
+		boost::shared_ptr<void>							m_hMonitorThreadExit;
 
-		static shared_ptr<void>						s_environmentBlock;
-		static shared_ptr<Mutex>					s_parentProcessWatchdog;
+		static boost::shared_ptr<void>						s_environmentBlock;
+		static boost::shared_ptr<Mutex>					s_parentProcessWatchdog;
 
 };
 

@@ -75,7 +75,6 @@ extern CAppModule _Module;
 #include <string>
 #include <map>
 #include <vector>
-using namespace std;
 #pragma warning(pop)
 
 #pragma warning(push)
@@ -85,7 +84,6 @@ using namespace std;
 #include <boost/format.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
-using namespace boost;
 #pragma warning(pop)
 
 #pragma warning(push)

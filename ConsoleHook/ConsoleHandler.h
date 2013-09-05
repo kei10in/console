@@ -31,9 +31,9 @@ class ConsoleHandler
 
 		void CopyConsoleText();
 
-		void SendConsoleText(HANDLE hStdIn, const shared_ptr<wchar_t>& textBuffer);
+		void SendConsoleText(HANDLE hStdIn, const boost::shared_ptr<wchar_t>& textBuffer);
 
-		void SetResetKeyInput(scoped_array<INPUT>& kbdInputs, WORD wVk, short& sCount);
+		void SetResetKeyInput(boost::scoped_array<INPUT>& kbdInputs, WORD wVk, short& sCount);
 
 		void SendMouseEvent(HANDLE hStdIn);
 
@@ -59,8 +59,8 @@ class ConsoleHandler
 		SharedMemory<ConsoleSize>					m_newConsoleSize;
 		SharedMemory<SIZE>							m_newScrollPos;
 
-		shared_ptr<void>							m_hMonitorThread;
-		shared_ptr<void>							m_hMonitorThreadExit;
+		boost::shared_ptr<void>							m_hMonitorThread;
+		boost::shared_ptr<void>							m_hMonitorThreadExit;
 
 		DWORD										m_dwScreenBufferSize;
 };

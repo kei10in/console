@@ -60,7 +60,7 @@ SelectionHandler::~SelectionHandler()
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-void SelectionHandler::SelectWord(const COORD& coordInit, COLORREF crSelectionColor, shared_array<CharInfo> screenBuffer)
+void SelectionHandler::SelectWord(const COORD& coordInit, COLORREF crSelectionColor, boost::shared_array<CharInfo> screenBuffer)
 {
 	if (m_selectionState > selstateNoSelection) return;
 
@@ -118,7 +118,7 @@ void SelectionHandler::SelectWord(const COORD& coordInit, COLORREF crSelectionCo
 
 //////////////////////////////////////////////////////////////////////////////
 
-void SelectionHandler::StartSelection(const COORD& coordInit, COLORREF crSelectionColor, shared_array<CharInfo> screenBuffer)
+void SelectionHandler::StartSelection(const COORD& coordInit, COLORREF crSelectionColor, boost::shared_array<CharInfo> screenBuffer)
 {
 	if (m_selectionState > selstateNoSelection) return;
 
@@ -158,7 +158,7 @@ void SelectionHandler::StartSelection(const COORD& coordInit, COLORREF crSelecti
 
 //////////////////////////////////////////////////////////////////////////////
 
-void SelectionHandler::UpdateSelection(const COORD& coordCurrent, shared_array<CharInfo> screenBuffer)
+void SelectionHandler::UpdateSelection(const COORD& coordCurrent, boost::shared_array<CharInfo> screenBuffer)
 {
 	if ((m_selectionState != selstateStartedSelecting) &&
 		(m_selectionState != selstateSelecting))

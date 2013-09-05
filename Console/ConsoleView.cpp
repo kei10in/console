@@ -30,7 +30,7 @@ int		ConsoleView::m_nCharWidth(0);
 
 //////////////////////////////////////////////////////////////////////////////
 
-ConsoleView::ConsoleView(MainFrame& mainFrame, DWORD dwTabIndex, const wstring& strCmdLineInitialDir, const wstring& strInitialCmd, const wstring& strDbgCmdLine, DWORD dwRows, DWORD dwColumns)
+ConsoleView::ConsoleView(MainFrame& mainFrame, DWORD dwTabIndex, const std::wstring& strCmdLineInitialDir, const std::wstring& strInitialCmd, const std::wstring& strDbgCmdLine, DWORD dwRows, DWORD dwColumns)
 : m_mainFrame(mainFrame)
 , m_strCmdLineInitialDir(strCmdLineInitialDir)
 , m_strInitialCmd(strInitialCmd)
@@ -171,7 +171,7 @@ LRESULT ConsoleView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, B
 	if (!m_background) m_tabData->backgroundImageType = bktypeNone;
 
 	// TODO: error handling
-	wstring strInitialDir(m_consoleSettings.strInitialDir);
+	std::wstring strInitialDir(m_consoleSettings.strInitialDir);
 
 	if (m_strCmdLineInitialDir.length() > 0)
 	{
@@ -182,7 +182,7 @@ LRESULT ConsoleView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, B
 		strInitialDir = m_tabData->strInitialDir;
 	}
 
-	wstring	strShell(m_consoleSettings.strShell);
+	std::wstring	strShell(m_consoleSettings.strShell);
 	bool	bDebugFlag = false;
 
 	if (m_strDbgCmdLine.length() > 0)
@@ -206,7 +206,7 @@ LRESULT ConsoleView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, B
 									userCredentials->user,
 									userCredentials->password,
 									m_strInitialCmd,
-									g_settingsHandler->GetAppearanceSettings().windowSettings.bUseConsoleTitle ? m_tabData->strTitle : wstring(L""),
+									g_settingsHandler->GetAppearanceSettings().windowSettings.bUseConsoleTitle ? m_tabData->strTitle : std::wstring(L""),
 									m_dwStartupRows, 
 									m_dwStartupColumns,
 									bDebugFlag);
@@ -1431,7 +1431,7 @@ void ConsoleView::Paste()
 
 void ConsoleView::DumpBuffer()
 {
-	wofstream of;
+	std::wofstream of;
 	of.open(Helpers::ExpandEnvironmentStrings(_T("%temp%\\console.dump")).c_str());
 	DWORD       dwOffset = 0;
 	MutexLock	bufferLock(m_bufferMutex);
@@ -1444,7 +1444,7 @@ void ConsoleView::DumpBuffer()
 			++dwOffset;
 		}
 
-		of << endl;
+		of << std::endl;
 	}
 
 	of.close();
@@ -1525,7 +1525,7 @@ void ConsoleView::CreateOffscreenBuffers()
 	// create font
 	if (!CreateFont(m_appearanceSettings.fontSettings.strName))
 	{
-		CreateFont(wstring(L"Courier New"));
+		CreateFont(std::wstring(L"Courier New"));
 	}
 
 	// get ClearType status
@@ -1617,7 +1617,7 @@ void ConsoleView::CreateOffscreenBitmap(CDC& cdc, const CRect& rect, CBitmap& bi
 
 //////////////////////////////////////////////////////////////////////////////
 
-bool ConsoleView::CreateFont(const wstring& strFontName)
+bool ConsoleView::CreateFont(const std::wstring& strFontName)
 {
 	if (!m_fontText.IsNull()) return true;// m_fontText.DeleteObject();
 	if (!m_fontTextHigh.IsNull()) return true;// m_fontTextHigh.DeleteObject();
@@ -1962,7 +1962,7 @@ void ConsoleView::RepaintText(CDC& dc)
 	int			nCharWidths	= 0;
 	bool		bTextOut	= false;
 
-	wstring		strText(L"");
+	std::wstring		strText(L"");
 
 	for (DWORD i = 0; i < consoleParams->dwRows; ++i)
 	{
